@@ -33,3 +33,6 @@ Remove `console=serial0,115200`
 
  - Writing from terminal
  `echo "Hello, world!" > /dev/serial0`
+
+- mini UART pinout available on https://pinout.xyz/pinout/uart
+ - Using pin 6 as GND
