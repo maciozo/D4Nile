@@ -70,13 +70,30 @@ int uartLoop(FILE *uartDevice)
     return 0;
 }
 
-int uartSend(char* string)
+int uartSendRaw(char* string)
 {
     if (strlen(string) > SENDBUFFER_SIZE)
     {
-        return -1;
+        return 1;
     }
     sendBuffer = string;
+    return 0;
+}
+
+int uartSendCommand(uint8_t command, int16_t data)
+{
+    char toSend[4];
+    if ((command < 0x20) | (command > CTRL_MAX))
+    {
+        return 1;
+    }
+    
+    toSend[0] = (uint8_t)command;
+    toSend[1] = (int8_t)(data >> 8);
+    toSend[2] = (int8_t)(data & 0x00FF);
+    
+    uartSendRaw((char*)toSend);
+    
     return 0;
 }
 

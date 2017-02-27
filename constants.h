@@ -1,7 +1,7 @@
 #ifndef _CONSTANTS
 #define _CONSTANTS
 
-/* ==============================Pi <-> MC UART Protocol===================== */
+/* ==============================MC -> Pi UART Protocol===================== */
 
     /* Accelerometer data */
     #define ACC_X 0x20
@@ -35,6 +35,18 @@
     #define GPS_E 0x32
     #define GPS_A 0x33
     
+    #define RECV_MAX 0x33
+    
+/* ========================================================================== */
+
+/* ==============================Pi -> MC UART Protocol===================== */
+
+    #define L_ANALOGUE_X 0x20
+    #define L_ANALOGUE_Y 0x21
+    
+    #define R_ANALOGUE_X 0x22
+    #define R_ANALOGUE_Y 0x23
+
 /* ========================================================================== */
 
 #endif

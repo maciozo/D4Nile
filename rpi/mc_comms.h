@@ -42,6 +42,9 @@ sensordata_t sensorData;
 int uartInit(char* device);
 int uartLoop(FILE *uartDevice);
 char* uartReadRaw(void);
-int uartSend(char* string);
+int uartSendRaw(char* string);
+
+int uartSendCommand(uint8_t command, int16_t data);
+sensordata_t getSensorData(void);
 
 #endif
