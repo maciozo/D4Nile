@@ -1,5 +1,5 @@
-#ifndef _CONSTANTS
-#define _CONSTANTS
+#ifndef _CONSTANTS_H
+#define _CONSTANTS_H
 
 /* ==============================MC -> Pi UART Protocol===================== */
 
