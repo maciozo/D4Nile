@@ -15,7 +15,7 @@
 
     /* Magnetometer data */
     #define MAG_X 0x26
-    #deinfe MAG_Y 0x27
+    #define MAG_Y 0x27
     #define MAG_Z 0x28
 
     /* Altitude data */
@@ -41,11 +41,13 @@
 
 /* ==============================Pi -> MC UART Protocol===================== */
 
-    #define L_ANALOGUE_X 0x20
-    #define L_ANALOGUE_Y 0x21
+    #define YAW_LEFT 0x20
+    #define THROTTLE_UP 0x21
     
-    #define R_ANALOGUE_X 0x22
-    #define R_ANALOGUE_Y 0x23
+    #define ROLL_LEFT 0x22
+    #define PITCH_FORWARD 0x23
+
+    #define X_BUTTON 0x24
 
 /* ========================================================================== */
 
