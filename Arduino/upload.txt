@@ -1,0 +1,6 @@
+avr-gcc -mmcu=atmega328p -DF_CPU=16000000 -Wall -Os main.c -o main.elf
+
+avr-objcopy -O ihex main.elf main.hex
+pause
+avrdude -v -patmega328p -carduino -PCOM5 -b115200 -D -Uflash:w:main.hex:i 
+pause
