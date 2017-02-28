@@ -25,6 +25,11 @@ FILE* uartInit(const char* device)
     return serial;
 }
 
+void uartClose(FILE* uartDevice)
+{
+    flose(uartDevice);
+}
+
 int uartSendRaw(char* string, FILE* uartDevice)
 {
     if (strlen(string) > SENDBUFFER_SIZE)
@@ -43,6 +48,11 @@ int uartSendCommand(uint8_t command, int16_t data, FILE* uartDevice)
         return 1;
     }
     
+    /*
+        Convert 8 bit command and 16 bit data in to a 24 bit string.
+        8 bit command, 2x 8 bit data.
+        CCCCCCCC|DDDDDDDD|DDDDDDDD
+    */
     toSend[0] = (uint8_t)command;
     toSend[1] = (int8_t)(data >> 8);
     toSend[2] = (int8_t)(data & 0x00FF);

@@ -6,6 +6,7 @@
 #define SENDBUFFER_SIZE 64
 
 int uartInit(char* device);
+void uartClose(FILE* uartDevice);
 char* uartReadRaw(FILE* uartDevice);
 int uartSendRaw(char* string, FILE* uartDevice);
 int uartSendCommand(uint8_t command, int16_t data, FILE* uartDevice);
