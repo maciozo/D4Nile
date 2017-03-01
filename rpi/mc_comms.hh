@@ -1,11 +1,13 @@
 #ifndef _MC_COMMS_H
 #define _MC_COMMS_H
 
-#define SERIAL_DEVICE "/dev/serial0"
-#define RECVBUFFER_SIZE 64
-#define SENDBUFFER_SIZE 64
+#include <stdint.h>
 
-int uartInit(char* device);
+#define SERIAL_DEVICE "/dev/serial0"
+#define RECVBUFFER_SIZE 5
+#define SENDBUFFER_SIZE 5
+
+FILE* uartInit(const char* device);
 void uartClose(FILE* uartDevice);
 char* uartReadRaw(FILE* uartDevice);
 int uartSendRaw(char* string, FILE* uartDevice);
