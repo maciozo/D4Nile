@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Lock core frequency to 250MHz
 echo "enable_uart=1" >> /boot/config.txt
 
