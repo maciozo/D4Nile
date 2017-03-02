@@ -41,13 +41,14 @@
 
 /* ==============================Pi -> MC UART Protocol===================== */
 
-    #define YAW_LEFT 0x20
+    #define YAW_CCW 0x20
     #define THROTTLE_UP 0x21
     
     #define ROLL_LEFT 0x22
     #define PITCH_FORWARD 0x23
 
-    #define X_BUTTON 0x24
+    #define MODE_BUTTON 0x24
+    #define SERVO_BUTTON 0x25
 
 /* ========================================================================== */
 
