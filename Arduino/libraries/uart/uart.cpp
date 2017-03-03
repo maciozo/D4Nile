@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <avr/io.h>
 
 void uartInit(void)
 {

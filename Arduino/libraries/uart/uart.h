@@ -16,6 +16,8 @@ If we have issues with the baud rate try defining DOUBLE_UART_RATE
     #define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
 #endif
 
+#include <stdint.h>
+
 /* ========================================================================= */
 
 /* Initialise the USART hardware */
