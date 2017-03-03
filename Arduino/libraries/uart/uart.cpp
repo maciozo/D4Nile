@@ -67,7 +67,7 @@ void uartSendCommand(uint8_t command, int16_t data)
     return;
 }
 
-void uartReadRaw(unsigned int length, char* str)
+void uartReadRaw(char* string, unsigned int length)
 {
     unsigned int i;
     
