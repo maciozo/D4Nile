@@ -6,10 +6,10 @@
 
 void uartInit(void)
 {
-    PRR &= ~PRUSART0; /* Disable USART power reduction */
+    PRR &= ~(1 << PRUSART0); /* Disable USART power reduction */
     
     #ifdef DOUBLE_UART_RATE
-        UCSR0A |= U2X0
+        UCSR0A |= (1 << U2X0)
     #endif
     
     UBRR0H = (uint8_t)(BAUD_PRESCALLER >> 8);
@@ -18,20 +18,20 @@ void uartInit(void)
     UCSR0B = RXEN0 | TXEN0; /* Enable USART RX/TX */
     
     /* Set to asynchronous */
-    UCSR0C &= ~UMSEL01;
-    UCSR0C &= ~UMSEL00;
+    UCSR0C &= ~(1 << UMSEL01);
+    UCSR0C &= ~(1 << UMSEL00);
     
     /* Disabling parity, since the RPi3 doesn't support it */
-    USCR0C &= ~UPM01;
-    USCR0C &= ~UPM00;
+    USCR0C &= ~(1 << UPM01);
+    USCR0C &= ~(1 << UPM00);
     
     /* 1 stop bit. */
-    USCR0C &= ~USBS0;
+    USCR0C &= ~(1 << USBS0);
     
     /* 8 bit character size */
-    USCR0C &= ~UCSZ02;
-    USCR0C |= UCSZ01;
-    USCR0C |= UCSZ00;
+    USCR0C &= ~(1 << UCSZ02);
+    USCR0C |= (1 << UCSZ01);
+    USCR0C |= (1 << UCSZ00);
     
     return;
 }
@@ -43,7 +43,7 @@ void uartSendRaw(char* string, unsigned int length)
     for (i = 0; i < length; i++)
     {
         /* Wait until the transmit buffer is populated. UDREn goes high when data register is empty. */
-        while (!(UCSR0A & UDRE0));
+        while (!(UCSR0A & (1 << UDRE0)));
         
         /* Put character in to transmission buffer */
         UDR0 = string[i];
@@ -74,7 +74,7 @@ void uartReadRaw(char* string, unsigned int length)
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
-        while (!(UCSR0A & RXC0));
+        while (!(UCSR0A & (1 << RXC0)));
         
         /* Store character from transmission buffer */
         str[i] = UDR0;
