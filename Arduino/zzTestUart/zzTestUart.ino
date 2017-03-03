@@ -5,8 +5,10 @@
 
 void setup()
 {
+    char string[9]= "testing!";
+  //  char[9] string = "testing!";
     uartInit();
-    uartSendRaw("testing!", 9);
+    uartSendRaw(string, 9);
 }
 
 void loop()
@@ -15,15 +17,16 @@ void loop()
     commanddata_t commandData = {0};
     while (1)
     {
-        dumpCommandData(*commandData);
+        dumpCommandData(&commandData);
         uartReadRaw(recvBuffer, 5);
-        formatData(*commandData, recvBuffer);
+        formatData(&commandData, recvBuffer);
     }
 }
 
 void dumpCommandData(commanddata_t* commandData)
 {
     char toSend[32];
+    char newLine[2] = "\n";
     
     sprintf(toSend, "YAWCCW: %d\n", commandData->yaw_ccw);
     uartSendRaw(toSend, 32);
@@ -43,7 +46,7 @@ void dumpCommandData(commanddata_t* commandData)
     sprintf(toSend, "SERVOBUTTON: %d\n", commandData->throttle_up);
     uartSendRaw(toSend, 32);
     
-    uartSendRaw("\n", 2);
+    uartSendRaw(newLine, 2);
     
     return;
 }
