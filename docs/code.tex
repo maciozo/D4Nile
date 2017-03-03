@@ -1,0 +1,54 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[margin=1in]{geometry}
+\renewcommand{\baselinestretch}{1.2} % line spacing
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  numbers=left
+}
+
+\begin{document}
+
+\linespread{0.8}
+
+\lstinputlisting[caption={Constants header. Currently used for UART protocol. (constants.h)}, label=ls:constants_h]{../constants.h}
+\lstinputlisting[caption={Joystick++ header (rpi/joystick.hh)}, label=ls:joystick_h]{../rpi/joystick.hh}
+\lstinputlisting[caption={Joystick++ (rpi/joystick.cc)}, label=ls:joystick]{../rpi/joystick.cc}
+\lstinputlisting[caption={Type definition for sensor data (rpi/sensorData.hh)},  label=ls:sensorData_h]{../rpi/sensorData.hh}
+\lstinputlisting[caption={Function for formatting incoming sensor data. (rpi/sensorData.cc)}, label=ls:sensorData]{../rpi/sensorData.cc}
+\lstinputlisting[caption={Header file for RPi comms library. (rpi/mc\_comms.hh)}, label=ls:mccomms_h]{../rpi/mc_comms.hh}
+\lstinputlisting[caption={RPi comms library. (rpi/mc\_comms.cc)}, label=ls:mccomms]{../rpi/mc_comms.cc}
+\lstinputlisting[caption={PS4 Controller to RPi UART test. (rpi/tests/test-ps4-uart.cc)}, label=ls:ps4uarttest]{../rpi/tests/test-ps4-uart.cc}
+\lstinputlisting[caption={Header file for IMU. (Arduino/MPU9250\_reg.h)}, label=ls:mpureg_h]{../Arduino/MPU9250_reg.h}
+\lstinputlisting[caption={I2C header file. (Arduino/i2c.h)}, label=ls:i2c_h]{../Arduino/i2c.h}
+\lstinputlisting[caption={I2C library. (Arduino/i2c.c)}, label=ls:i2c]{../Arduino/i2c.c}
+\lstinputlisting[caption={IR Sensor header file. (Arduino/ir.h)}, label=ls:ir_h]{../Arduino/ir.h}
+\lstinputlisting[caption={IR Sensor library. (Arduino/ir.c)}, label=ls:ir]{../Arduino/ir.c}
+\lstinputlisting[caption={PID Control header file. (Arduino/pid.h)}, label=ls:pid_h]{../Arduino/pid.h}
+\lstinputlisting[caption={PID Control library. (Arduino/pid.c)}, label=ls:pid]{../Arduino/pid.c}
+\lstinputlisting[caption={Ultrasonic Sensor header file. (Arduino/sonar.h)}, label=ls:sonar_h]{../Arduino/sonar.h}
+\lstinputlisting[caption={Ultrasonic Sensor library. (Arduino/sonar.c)}, label=ls:sonar]{../Arduino/sonar.c}
+\lstinputlisting[caption={UART header file. (Arduino/uart.h)}, label=ls:uart_h]{../Arduino/uart.h}
+\lstinputlisting[caption={UART library. (Arduino/uart.c)}, label=ls:uart]{../Arduino/uart.c}
+\lstinputlisting[caption={Seeeduino main. (Arduino/main.c)}, label=ls:mc_main]{../Arduino/main.c}
+
+\end{document}

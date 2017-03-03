@@ -16,10 +16,10 @@ FILE* uartInit(const char* device)
     
     /* Making fgets non-blocking 
     http://stackoverflow.com/a/6055774 */
-    //int fd = fileno(serial);
-    //int flags = fcntl(fd, F_GETFL, 0);
-    //flags |= O_NONBLOCK;
-    //fcntl(fd, F_SETFL, flags);
+    int fd = fileno(serial);
+    int flags = fcntl(fd, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    fcntl(fd, F_SETFL, flags);
     
     /* fclose(serial); */
     
