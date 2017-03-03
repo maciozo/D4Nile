@@ -1,3 +1,4 @@
+#define F_CPU 16000000L
 #include <util/delay.h>
 
 #ifndef PID_H_
