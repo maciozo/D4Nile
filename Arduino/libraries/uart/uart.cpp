@@ -15,7 +15,7 @@ void uartInit(void)
     UBRR0H = (uint8_t)(BAUD_PRESCALLER >> 8);
     UBRR0L = (uint8_t)(BAUD_PRESCALLER);
     
-    UCSR0B = RXEN0 | TXEN0; /* Enable USART RX/TX */
+    UCSR0B = (1 << RXEN0) | (1 << TXEN0); /* Enable USART RX/TX */
     
     /* Set to asynchronous */
     UCSR0C &= ~(1 << UMSEL01);
