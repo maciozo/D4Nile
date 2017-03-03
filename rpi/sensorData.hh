@@ -30,4 +30,6 @@ typedef struct
   int16_t gps_a;
 } sensordata_t;
 
+int formatData(sensordata_t* sensorData, char* rawdata);
+
 #endif

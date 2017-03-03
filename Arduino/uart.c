@@ -1,32 +1,38 @@
 #include "uart.h"
+#include "../constants.h"
 
-void USART_init(void){
- 
- UBRR0H = (uint8_t)(BAUD_PRESCALLER>>8);
- UBRR0L = (uint8_t)(BAUD_PRESCALLER);
- UCSR0B = (1<<RXEN0)|(1<<TXEN0);
- UCSR0C = (3<<UCSZ00);
+void uartInit(void)
+{
+    Serial.begin(UART_BAUD);
+    pinMode(D0, INPUT);
+    pinMode(D1, OUTPUT);
+    return;
 }
- 
-unsigned char USART_receive(void){
- 
- while(!(UCSR0A & (1<<RXC0)));
- return UDR0;
- //i = atoi (String);
- 
+
+void uartSendRaw(char* string)
+{
+    Serial.write(string, MC_SENDBUFFER_SIZE);
+    return;
 }
- 
-void USART_send( unsigned char data){
- 
- while(!(UCSR0A & (1<<UDRE0)));
- UDR0 = data;
- 
+
+void uartSendCommand(uint8_t command, int16_t data)
+{
+    char toSend[MC_SENDBUFFER_SIZE];
+    
+    toSend[0] = (char)command;
+    toSend[1] = (char)(data >> 8);
+    toSend[2] = (char)(data);
+    toSend[3] = '\n';
+    toSend[4] = '\0';
+    
+    uartSendRaw(toSend);
+    
+    return;
 }
- 
-void USART_putstring(char* StringPtr){
- 
-while(*StringPtr != 0x00){
- USART_send(*StringPtr);
- StringPtr++;}
- 
+
+char* uartReadRaw(void)
+{
+    char readBuffer[MC_RECVBUFFER_SIZE];
+    Serial.readBytesUntil('\0', readBuffer, MC_READBUFFER_SIZE);
+    return readBuffer;
 }

@@ -1,13 +1,12 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
+#ifndef UART_H
+#define UART_H
 
-#define BLINK_DELAY_MS 1000
-#define BAUDRATE 9600
-#define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
+#define MC_RECVBUFFER_SIZE 5
+#define MC_SENDBUFFER_SIZE 5
 
+void uartInit(void);
+void uartSendRaw(char* string);
+void uartSendCommand(uint8_t command, int16_t data);
+char* uartReadRaw(void);
 
-void USART_init(void);
-unsigned char USART_receive(void);
-void USART_send( unsigned char data);
-void USART_putstring(char* StringPtr);
+#endif
