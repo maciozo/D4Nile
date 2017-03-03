@@ -9,9 +9,9 @@ void uartInit(void)
     return;
 }
 
-void uartSendRaw(char* string)
+void uartSendRaw(char* string, unsigned int length)
 {
-    Serial.write(string, MC_SENDBUFFER_SIZE);
+    Serial.write(string, length);
     return;
 }
 
@@ -25,14 +25,15 @@ void uartSendCommand(uint8_t command, int16_t data)
     toSend[3] = '\n';
     toSend[4] = '\0';
     
-    uartSendRaw(toSend);
+    uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
     
     return;
 }
 
-char* uartReadRaw(void)
+char* uartReadRaw(int length)
 {
-    char readBuffer[MC_RECVBUFFER_SIZE];
-    Serial.readBytesUntil('\0', readBuffer, MC_READBUFFER_SIZE);
+    char *readBuffer;
+    readBuffer = names = (char*)malloc(length * sizeof(char));
+    Serial.readBytesUntil('\0', readBuffer, length);
     return readBuffer;
 }
