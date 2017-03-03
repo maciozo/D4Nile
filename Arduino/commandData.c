@@ -1,28 +1,29 @@
-#include "sensorData.h"
+#include "commandData.h"
+#include "constants.h"
 
-int formatData(sensordata_t* sensorData, char* rawdata)
+int formatData(commanddata_t* commandData, char* rawdata)
 {
-    tempData = (rawdata[1] << 8) | rawdata[2];
+    int16_t tempData = (rawdata[1] << 8) | rawdata[2];
     switch (rawdata[0])
     {
         case YAW_CCW:
-            sensorData->yaw_ccw = tempData;
+            commandData->yaw_ccw = tempData;
             break;
         case THROTTLE_UP:
-            sensorData->throttle_up = tempData;
+            commandData->throttle_up = tempData;
             break;
         case ROLL_LEFT:
-            sensorData->roll_left = tempData;
+            commandData->roll_left = tempData;
             break;
             
         case PITCH_FORWARD:
-            sensorData->pitch_forward = tempData;
+            commandData->pitch_forward = tempData;
             break;
         case MODE_BUTTON:
-            sensorData->mode_button = tempData;
+            commandData->mode_button = tempData;
             break;
         case SERVO_BUTTON:
-            sensorData->servo_button = tempData;
+            commandData->servo_button = tempData;
             break;
         default:
             return 1;

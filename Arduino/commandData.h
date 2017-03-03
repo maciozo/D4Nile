@@ -1,6 +1,8 @@
 #ifndef _CD_H
 #define _CD_H
 
+#include <stdint.h>
+
 typedef struct
 {
   int16_t yaw_ccw;
@@ -11,6 +13,6 @@ typedef struct
   int16_t servo_button;
 } commanddata_t;
 
-int formatData(sensordata_t* sensorData, char* rawdata);
+int formatData(commanddata_t* commandData, char* rawdata);
 
 #endif

@@ -1,5 +1,5 @@
 #include "uart.h"
-#include "../constants.h"
+#include "constants.h"
 
 void uartInit(void)
 {
