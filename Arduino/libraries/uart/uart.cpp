@@ -1,5 +1,5 @@
 #include "uart.h"
-#include "../constants.h"
+#include "constants.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -10,7 +10,7 @@ void uartInit(void)
     PRR &= ~(1 << PRUSART0); /* Disable USART power reduction */
     
     #ifdef DOUBLE_UART_RATE
-        UCSR0A |= (1 << U2X0)
+        UCSR0A |= (1 << U2X0);
     #endif
     
     UBRR0H = (uint8_t)(BAUD_PRESCALLER >> 8);

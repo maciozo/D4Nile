@@ -5,7 +5,8 @@
 
 void setup()
 {
-    char[9] string = "testing!";
+    char string[9]="testing!";
+    //char[9] string = "testing!";
     uartInit();
     uartSendRaw(string, 9);
 }
@@ -45,7 +46,7 @@ void dumpCommandData(commanddata_t* commandData)
     sprintf(toSend, "SERVOBUTTON: %d\n", commandData->throttle_up);
     uartSendRaw(toSend, 32);
     
-    uartSendRaw(newLine, 2)
+    uartSendRaw(newLine, 2);
     
     return;
 }

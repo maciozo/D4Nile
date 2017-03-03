@@ -10,6 +10,7 @@
 If we have issues with the baud rate try defining DOUBLE_UART_RATE
 */
 
+#define DOUBLE_UART_RATE
 #ifdef DOUBLE_UART_RATE
     #define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 8UL))) - 1)
 #else
