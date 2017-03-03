@@ -23,16 +23,16 @@ void uartInit(void)
     UCSR0C &= ~(1 << UMSEL00);
     
     /* Disabling parity, since the RPi3 doesn't support it */
-    USCR0C &= ~(1 << UPM01);
-    USCR0C &= ~(1 << UPM00);
+    UCSR0C &= ~(1 << UPM01);
+    UCSR0C &= ~(1 << UPM00);
     
     /* 1 stop bit. */
-    USCR0C &= ~(1 << USBS0);
+    UCSR0C &= ~(1 << USBS0);
     
     /* 8 bit character size */
-    USCR0C &= ~(1 << UCSZ02);
-    USCR0C |= (1 << UCSZ01);
-    USCR0C |= (1 << UCSZ00);
+    UCSR0C &= ~(1 << UCSZ02);
+    UCSR0C |= (1 << UCSZ01);
+    UCSR0C |= (1 << UCSZ00);
     
     return;
 }
@@ -71,13 +71,12 @@ void uartSendCommand(uint8_t command, int16_t data)
 void uartReadRaw(char* string, unsigned int length)
 {
     unsigned int i;
-    
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
         while (!(UCSR0A & (1 << RXC0)));
         
         /* Store character from transmission buffer */
-        str[i] = UDR0;
+        string[i] = UDR0;
     }
 }
