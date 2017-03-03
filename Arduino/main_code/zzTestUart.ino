@@ -6,14 +6,19 @@
 void setup()
 {
     uartInit();
-    uartSendRaw("testing!", 9)
+    uartSendRaw("testing!", 9);
 }
 
 void loop()
 {
-    dumpCommandData(*commandData);
-    recvBuffer = uartReadRaw(5);
-    formatData(*commandData, recvBuffer);
+    char recvBuffer[5];
+    commanddata_t commandData = {0};
+    while (1)
+    {
+        dumpCommandData(*commandData);
+        uartReadRaw(recvBuffer, 5);
+        formatData(*commandData, recvBuffer);
+    }
 }
 
 void dumpCommandData(commanddata_t* commandData)
