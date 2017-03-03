@@ -11,6 +11,7 @@ If we have issues with the baud rate try defining DOUBLE_UART_RATE
 */
 
 #define DOUBLE_UART_RATE
+
 #ifdef DOUBLE_UART_RATE
     #define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 8UL))) - 1)
 #else
@@ -26,7 +27,7 @@ void uartInit(void);
 
 /* Send a string over UART.
     char* string: string to be sent
-    unsigned int length: length of the string, including '\0'
+    unsigned int length: length of the string, including '\0'. Will stop sending on '\0'.
 */
 void uartSendRaw(char* string, unsigned int length);
 

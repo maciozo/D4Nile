@@ -48,6 +48,12 @@ void uartSendRaw(char* string, unsigned int length)
         
         /* Put character in to transmission buffer */
         UDR0 = string[i];
+        
+        /* Reached end of string */
+        if (string[i] == '\0')
+        {
+            break;
+        }
     }
     
     return;

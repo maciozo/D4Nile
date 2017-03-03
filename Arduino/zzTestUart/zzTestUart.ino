@@ -5,10 +5,9 @@
 
 void setup()
 {
-    char string[9]="testing!";
-    //char[9] string = "testing!";
+    char string[10] = "testing!\n";
     uartInit();
-    uartSendRaw(string, 9);
+    uartSendRaw(string, 10);
 }
 
 void loop()
