@@ -13,6 +13,7 @@
 				pitch: 0,
 				yaw: 0,
 			};
+			let quad;
 
 			// handle WebScoket
 			const socket = new WebSocket("ws://localhost:8080");
@@ -33,25 +34,31 @@
 			renderer.setSize(600, 400);
 			document.body.appendChild(renderer.domElement);
 
-			// create green cube with Lambertian material
-			const geometry = new THREE.BoxGeometry(1, 1, 1);
-			const material = new THREE.MeshLambertMaterial({color: 0x00FF00});
-			const cube = new THREE.Mesh(geometry, material);
-			scene.add(cube);
+			// load quad with Lambertian material asynchonously from server
+			const loader = new THREE.JSONLoader();
+			loader.load('dronemodel', function(geometry, materials) {
+				const material = new THREE.MeshLambertMaterial({color: 0xFF00FF});
+				quad = new THREE.Mesh(geometry, material);
+				scene.add(quad);
+			});
 
-			// create light source to illuminate Lambertian material
-			const light = new THREE.PointLight(0xFFFFFF);
-			light.position.set(50, 50, 50);
-			scene.add(light);
+			// create light sources to illuminate Lambertian material
+			const light1 = new THREE.PointLight(0xFFFFFF);
+			light1.position.set(50, 50, 50);
+			scene.add(light1);
+			const light2 = new THREE.PointLight(0xFFFFFF);
+			light2.position.set(-50, -50, 50);
+			scene.add(light2);
 
-			camera.position.z = 5;
+			// camera distance from origin
+			camera.position.z = 15;
 			
 			// render loop - set cube rotation from server data on each loop
 			(function render() {
 				requestAnimationFrame(render);
-				cube.rotation.x = attitude.pitch;
-				cube.rotation.y = attitude.yaw;
-				cube.rotation.z = attitude.roll;
+				quad.rotation.x = attitude.pitch;
+				quad.rotation.y = attitude.yaw;
+				quad.rotation.z = attitude.roll;
 				renderer.render(scene, camera);
 			})();
 		</script>

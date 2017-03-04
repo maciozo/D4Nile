@@ -6,6 +6,9 @@ const WebSocket = require('ws');
 app.get('/', function (req, res) {
 	res.sendFile(__dirname+'/index.html');
 });
+app.get('/dronemodel', function(req, res) {
+	res.sendFile(__dirname+'/drone.json');
+});
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({server});
@@ -22,8 +25,8 @@ const attitude = {
 	yaw: 0
 };
 setInterval(() => {
-	attitude.pitch += 0.01;
-	attitude.roll += 0.03;
+	attitude.pitch += 0.05;
+	attitude.roll += 0.05;
 	wss.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
 			client.send(JSON.stringify(attitude));
