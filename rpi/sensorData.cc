@@ -2,7 +2,7 @@
 
 int formatData(sensordata_t* sensorData, char* rawdata)
 {
-    tempData = (rawdata[1] << 8) | rawdata[2];
+    int16_t tempData = (rawdata[1] << 8) | rawdata[2];
     switch (rawdata[0])
     {
         case ACC_X:
