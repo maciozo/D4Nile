@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ITCHEN postman</title>
+	</head>
+	<body>
+		<h1>Welcome to ITCHEN postman status</h1>
+		<script type="text/javascript">
+			console.log('Hello');
+			const socket = new WebSocket("ws://localhost:8080");
+			socket.onopen = function (event) {
+				socket.send("Hello from client");
+			}
+			socket.onmessage = event => {
+				console.log(event.data);
+			}
+		</script>
+	</body>
+</html>

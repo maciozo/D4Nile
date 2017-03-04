@@ -1,0 +1,15 @@
+{
+  "name": "telemetry_server",
+  "version": "1.0.0",
+  "description": "Web server to stream telemetry data from drone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ben Gesoff",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.0",
+    "ws": "^2.2.0"
+  }
+}
