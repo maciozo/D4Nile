@@ -87,7 +87,7 @@ void setup()
 void loop()
 {
 
-
+unsigned long time;
 
   
   // If intPin goes high, all data registers have new data
@@ -148,9 +148,9 @@ void loop()
 //  MadgwickQuaternionUpdate(ax, ay, az, gx*PI/180.0f, gy*PI/180.0f, gz*PI/180.0f,  my,  mx, mz);
  
   
-  MahonyQuaternionUpdate(myIMU.ax, myIMU.ay, myIMU.az, myIMU.gx*DEG_TO_RAD,
-                         myIMU.gy*DEG_TO_RAD, myIMU.gz*DEG_TO_RAD, myIMU.my,
-                         myIMU.mx, myIMU.mz, myIMU.deltat);
+  //MahonyQuaternionUpdate(myIMU.ax, myIMU.ay, myIMU.az, myIMU.gx*DEG_TO_RAD,
+                         //myIMU.gy*DEG_TO_RAD, myIMU.gz*DEG_TO_RAD, myIMU.my,
+                    //     myIMU.mx, myIMU.mz, myIMU.deltat);
 
 
 
@@ -221,8 +221,8 @@ void loop()
         Serial.print(myIMU.pitch, 2);
         Serial.print(", ");
         Serial.println(myIMU.roll, 2);
-
-      
+        time = millis();
+        Serial.println(time);
 
       myIMU.count = millis();
       myIMU.sumCount = 0;
