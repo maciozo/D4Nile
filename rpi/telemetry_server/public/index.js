@@ -10,9 +10,11 @@ const socket = new WebSocket("ws://"+location.host);
 socket.onopen = function (event) {
 	socket.send("Hello from client");
 }
+const messages_container = document.querySelector('#messages');
 socket.onmessage = event => {
 	console.log('received:', event.data);
 	attitude = JSON.parse(event.data);
+	messages_container.innerHTML += `${event.data}\n`;
 }
 
 let quad; // to hold quad object in order to rotate
@@ -21,7 +23,7 @@ let quad; // to hold quad object in order to rotate
 const scene = new THREE.Scene();
 const camera = create_camera();
 const renderer = create_renderer(600, 400);
-document.body.appendChild(renderer.domElement);
+document.querySelector('#rendering_container').appendChild(renderer.domElement);
 add_drone_to_scene(scene);
 add_lights_to_scene(scene);
 
