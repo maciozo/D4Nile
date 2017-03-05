@@ -1,14 +1,11 @@
-const app = require('express')();
+const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
+const SerialPort = require('serialport');
 
-// send index.html for root route
-app.get('/', function (req, res) {
-	res.sendFile(__dirname+'/index.html');
-});
-app.get('/dronemodel', function(req, res) {
-	res.sendFile(__dirname+'/drone.json');
-});
+// serve files directly from /public 
+const app = express();
+app.use(express.static('public'));
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({server});
@@ -27,9 +24,23 @@ const attitude = {
 setInterval(() => {
 	attitude.pitch += 0.05;
 	attitude.roll += 0.05;
-	wss.clients.forEach((client) => {
-		if (client.readyState === WebSocket.OPEN) {
-			client.send(JSON.stringify(attitude));
-		}
-	});
+	broadcast(attitude);
 }, 500);
+
+function broadcast(argument) {
+	wss.clients.forEach(client => {
+		if (client.readyState === WebSocket.OPEN)
+			client.send(JSON.stringify(argument));
+	});
+}
+
+// Open serial port at /dev/serial0
+const port = new SerialPort('/dev/serial0', {
+	baudRate: 115200,
+	parser: SerialPort.parsers.readline('\n')
+});
+
+// broadcast all serial data
+port.on('data', data => {
+	broadcast(data);
+});
