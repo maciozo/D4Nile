@@ -2,6 +2,7 @@
 #include "MPU6050_6Axis_MotionApps20.h"
 #include <HCMAX7219.h>
 #include "SPI.h"
+#include <PID_v1.h>
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
@@ -13,11 +14,9 @@
 // AD0 low = 0x68
 // AD0 high = 0x69
 
-MPU6050 mpu;
-HCMAX7219 HCMAX7219(LOAD);
+
 
 //MPU6050 mpu(0x69); // <-- use for AD0 high
-
 
 #define INTERRUPT_PIN 2
 #define LED_PIN 13
@@ -26,6 +25,13 @@ HCMAX7219 HCMAX7219(LOAD);
 //#define LED_G 6
 //#define LED_B 7 
 
+//pid definitions
+#define minPWM 2000
+#define maxPWM 4000
+#define thrust 3000
+
+MPU6050 mpu;
+HCMAX7219 HCMAX7219(LOAD);
 
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
@@ -43,6 +49,20 @@ volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin h
 void dmpDataReady() {
     mpuInterrupt = true;
 }
+
+double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
+double roll_angle, pitch_angle, yall_angle;
+double err_roll, err_pitch, err_yall;
+int left_front, right_front, left_back, right_back;
+
+double roll_kp=70, roll_ki=10, roll_kd=15;
+double pitch_kp=70, pitch_ki=10, pitch_kd=15;
+double yall_kp=70, yall_ki=10, yall_kd=15;
+
+PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
+PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
+PID yall_PID(&yall_angle, &err_yall, &yall_setpoint, yall_kp, yall_ki, yall_kd, DIRECT);
+
 
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -63,6 +83,23 @@ void setup() {
 //  pinMode(LED_R, OUTPUT);
 //  pinMode(LED_B, OUTPUT);
 //  pinMode(LED_G, OUTPUT);
+
+
+  roll_angle = 30;      // dummy inputs, when we're integrating modules
+  roll_setpoint = 0;    // these will be replaced by the outputs
+  pitch_angle = 25;     // from the Sensor and Pi_to_mc modules
+  pitch_setpoint = 0;
+  yall_angle = 35;
+  yall_setpoint = 0;
+  
+//  roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);         This is for Ben's part for tunning
+//  pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);     the PID values via the web server
+//  yall_PID.SetTunings(yall_kp, yall_ki, yall_kd);
+  
+  roll_PID.SetMode(AUTOMATIC);
+  pitch_PID.SetMode(AUTOMATIC);
+  yall_PID.SetMode(AUTOMATIC);
+
 
     
     // verify connection
@@ -114,14 +151,45 @@ void setup() {
 
 void loop() {
 unsigned long time;
-int yar = (ypr[0] * 180/M_PI);
+int yaw= (ypr[0] * 180/M_PI);
+
+roll_setpoint = 0;
+pitch_setpoint = 0;
+yall_setpoint = 0;
+altitude_coeff = 1;
+
+roll_angle = 30;
+roll_PID.Compute();
+
+pitch_angle = 25;
+pitch_PID.Compute();
+
+yall_angle = 35;
+yall_PID.Compute();
+
+
+left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
+left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
+right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+
+// set motor limits
+      if (right_back > maxPWM) right_back = maxPWM;
+        else if (right_back < minPWM) right_back = minPWM;                  
+      if (right_front > maxPWM) right_front = maxPWM;
+        else if (right_front < minPWM) right_front = minPWM;      
+      if (left_back > maxPWM) left_back = maxPWM;
+        else if (left_back < minPWM) left_back = minPWM;            
+      if (left_front > maxPWM) left_front = maxPWM;
+        else if (left_front < minPWM) left_front = minPWM;
+
     
        int a=0;
        Serial.print("program");
        Serial.print("\n");
     
        HCMAX7219.Clear();
-       HCMAX7219.print7Seg(yar,8);
+       HCMAX7219.print7Seg(yaw,8);
        HCMAX7219.Refresh();
 
     mpuInterrupt = false;  // reset interrupt flag and get INT_STATUS byte
