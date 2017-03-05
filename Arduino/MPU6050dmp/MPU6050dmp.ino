@@ -1,21 +1,35 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include <HCMAX7219.h>
+#include "SPI.h"
+
+
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
 #endif
 
+#define LOAD 10
 // class default I2C address is 0x68
 // specific I2C addresses may be passed as a parameter here
 // AD0 low = 0x68
 // AD0 high = 0x69
 MPU6050 mpu;
+HCMAX7219 HCMAX7219(LOAD);
+
 //MPU6050 mpu(0x69); // <-- use for AD0 high
 
 #define OUTPUT_READABLE_YAWPITCHROLL
 
 #define INTERRUPT_PIN 2
-#define LED_PIN 13 
+#define LED_PIN 13
+
+
+
+#define LED_R 5
+#define LED_G 6
+#define LED_B 7 
+
 bool blinkState = false;
 
 // MPU control/status vars
@@ -67,7 +81,11 @@ void setup() {
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
+    pinMode(LED_R, OUTPUT);
+    pinMode(LED_B, OUTPUT);
+    pinMode(LED_G, OUTPUT);
 
+    
     // verify connection
     Serial.println(F("Testing device connections..."));
     Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
@@ -106,6 +124,7 @@ void setup() {
         // 2 = DMP configuration updates failed
         // (if it's going to break, usually the code will be 1)
         Serial.print(F("DMP Initialization failed (code "));
+        
         Serial.print(devStatus);
         Serial.println(F(")"));
     }
@@ -119,18 +138,28 @@ void setup() {
 
 void loop() {
 unsigned long time;
+int yar = (ypr[0] * 180/M_PI);
+
     if (!dmpReady) return;
 
-    while (!mpuInterrupt && fifoCount < packetSize) {
-       
-        // other program behavior stuff here
- 
-    }
+   // while (!mpuInterrupt && fifoCount < packetSize) {
+       noInterrupts();
+       int a=0;
+       Serial.print("program");
+       Serial.print("\n");
+    
+       HCMAX7219.Clear();
+       HCMAX7219.print7Seg(yar,8);
+       HCMAX7219.Refresh();
+  
+      interrupts();
+   // }
 
     // reset interrupt flag and get INT_STATUS byte
     mpuInterrupt = false;
     mpuIntStatus = mpu.getIntStatus();
-
+//Serial.print(mpuIntStatus);
+//Serial.print("\n");
     // get current FIFO count
     fifoCount = mpu.getFIFOCount();
 
@@ -139,6 +168,8 @@ unsigned long time;
         // reset so we can continue cleanly
         mpu.resetFIFO();
         Serial.println(F("FIFO overflow!"));
+       // digitalWrite(LED_R, HIGH);
+
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
@@ -182,12 +213,22 @@ unsigned long time;
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+      
+            
+
+            
             Serial.print("ypr\t");
             Serial.print(ypr[0] * 180/M_PI);
             Serial.print("\t");
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print("\t");
             Serial.println(ypr[2] * 180/M_PI);
+
+
+               mpuIntStatus = mpu.getIntStatus();
+Serial.print(mpuIntStatus);
+Serial.print("\n");     
+    
         time = millis();
         Serial.println(time);
         #endif

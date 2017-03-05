@@ -1,21 +1,35 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include <HCMAX7219.h>
+#include "SPI.h"
+
+
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
 #endif
 
+#define LOAD 10
 // class default I2C address is 0x68
 // specific I2C addresses may be passed as a parameter here
 // AD0 low = 0x68
 // AD0 high = 0x69
 MPU6050 mpu;
+HCMAX7219 HCMAX7219(LOAD);
+
 //MPU6050 mpu(0x69); // <-- use for AD0 high
 
 #define OUTPUT_READABLE_YAWPITCHROLL
 
-#define INTERRUPT_PIN 2
-#define LED_PIN 13 
+//#define INTERRUPT_PIN 2
+#define LED_PIN 13
+
+
+
+#define LED_R 5
+#define LED_G 6
+#define LED_B 7 
+
 bool blinkState = false;
 
 // MPU control/status vars
@@ -41,10 +55,10 @@ uint8_t teapotPacket[14] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0x00, '\r', '\
 
 
 
-volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-void dmpDataReady() {
-    mpuInterrupt = true;
-}
+//volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
+//void dmpDataReady() {
+//    mpuInterrupt = true;
+//}
 
 
 
@@ -66,8 +80,12 @@ void setup() {
     // initialize device
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
-    pinMode(INTERRUPT_PIN, INPUT);
+  //  pinMode(INTERRUPT_PIN, INPUT);
+    pinMode(LED_R, OUTPUT);
+    pinMode(LED_B, OUTPUT);
+    pinMode(LED_G, OUTPUT);
 
+    
     // verify connection
     Serial.println(F("Testing device connections..."));
     Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
@@ -90,9 +108,9 @@ void setup() {
         mpu.setDMPEnabled(true);
 
         // enable Arduino interrupt detection
-        Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
-        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
-        mpuIntStatus = mpu.getIntStatus();
+  //      Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
+  //      attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+     //   mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
         Serial.println(F("DMP ready! Waiting for first interrupt..."));
@@ -106,6 +124,7 @@ void setup() {
         // 2 = DMP configuration updates failed
         // (if it's going to break, usually the code will be 1)
         Serial.print(F("DMP Initialization failed (code "));
+        
         Serial.print(devStatus);
         Serial.println(F(")"));
     }
@@ -119,122 +138,72 @@ void setup() {
 
 void loop() {
 unsigned long time;
-    if (!dmpReady) return;
+int yar = (ypr[0] * 180/M_PI);
 
-    while (!mpuInterrupt && fifoCount < packetSize) {
-       
-        // other program behavior stuff here
- 
-    }
+  //  if (!dmpReady) return;
+while(1){
+   // while (!mpuInterrupt && fifoCount < packetSize) {
+       int a=0;
+       Serial.print("program");
+       Serial.print("\n");
+
+  HCMAX7219.Clear();
+  HCMAX7219.print7Seg(yar,8);
+  HCMAX7219.Refresh();
+    
 
     // reset interrupt flag and get INT_STATUS byte
-    mpuInterrupt = false;
-    mpuIntStatus = mpu.getIntStatus();
+ //   mpuInterrupt = false;
+  //  mpuIntStatus = mpu.getIntStatus();
 
     // get current FIFO count
-    fifoCount = mpu.getFIFOCount();
+  //  fifoCount = mpu.getFIFOCount();
 
     // check for overflow (this should never happen unless our code is too inefficient)
-    if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+  //  if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
         // reset so we can continue cleanly
-        mpu.resetFIFO();
-        Serial.println(F("FIFO overflow!"));
+ //       mpu.resetFIFO();
+  //      Serial.println(F("FIFO overflow!"));
+       // digitalWrite(LED_R, HIGH);
+
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
-    } else if (mpuIntStatus & 0x02) {
+ //   } else if (mpuIntStatus & 0x02) {
         // wait for correct available data length, should be a VERY short wait
-        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+  //      while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
 
         // read a packet from FIFO
         mpu.getFIFOBytes(fifoBuffer, packetSize);
         
         // track FIFO count here in case there is > 1 packet available
         // (this lets us immediately read more without waiting for an interrupt)
-        fifoCount -= packetSize;
+     //   fifoCount -= packetSize;
 
-        #ifdef OUTPUT_READABLE_QUATERNION
-            // display quaternion values in easy matrix form: w x y z
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            Serial.print("quat\t");
-            Serial.print(q.w);
-            Serial.print("\t");
-            Serial.print(q.x);
-            Serial.print("\t");
-            Serial.print(q.y);
-            Serial.print("\t");
-            Serial.println(q.z);
-        #endif
 
-        #ifdef OUTPUT_READABLE_EULER
-            // display Euler angles in degrees
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetEuler(euler, &q);
-            Serial.print("euler\t");
-            Serial.print(euler[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(euler[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.println(euler[2] * 180/M_PI);
-        #endif
 
         #ifdef OUTPUT_READABLE_YAWPITCHROLL
             // display Euler angles in degrees
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+      
+            
+
+            
             Serial.print("ypr\t");
             Serial.print(ypr[0] * 180/M_PI);
             Serial.print("\t");
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print("\t");
             Serial.println(ypr[2] * 180/M_PI);
+
+
+                  
         time = millis();
         Serial.println(time);
+        delay(50);
         #endif
 
-        #ifdef OUTPUT_READABLE_REALACCEL
-            // display real acceleration, adjusted to remove gravity
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetAccel(&aa, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-            Serial.print("areal\t");
-            Serial.print(aaReal.x);
-            Serial.print("\t");
-            Serial.print(aaReal.y);
-            Serial.print("\t");
-            Serial.println(aaReal.z);
-        #endif
-
-        #ifdef OUTPUT_READABLE_WORLDACCEL
-            // display initial world-frame acceleration, adjusted to remove gravity
-            // and rotated based on known orientation from quaternion
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetAccel(&aa, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-            mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-            Serial.print("aworld\t");
-            Serial.print(aaWorld.x);
-            Serial.print("\t");
-            Serial.print(aaWorld.y);
-            Serial.print("\t");
-            Serial.println(aaWorld.z);
-        #endif
-    
-        #ifdef OUTPUT_TEAPOT
-            // display quaternion values in InvenSense Teapot demo format:
-            teapotPacket[2] = fifoBuffer[0];
-            teapotPacket[3] = fifoBuffer[1];
-            teapotPacket[4] = fifoBuffer[4];
-            teapotPacket[5] = fifoBuffer[5];
-            teapotPacket[6] = fifoBuffer[8];
-            teapotPacket[7] = fifoBuffer[9];
-            teapotPacket[8] = fifoBuffer[12];
-            teapotPacket[9] = fifoBuffer[13];
-            Serial.write(teapotPacket, 14);
-            teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
-        #endif
 
         // blink LED to indicate activity
         blinkState = !blinkState;
