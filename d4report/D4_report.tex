@@ -1,0 +1,116 @@
+\documentclass[12pt]{report}
+
+\usepackage[a4paper]{geometry}
+
+\usepackage{ifdraft}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{rotating}
+\usepackage{hyperref}
+\usepackage{subfig} % apparently subfig is the one to use not subfigure
+\usepackage{appendix}
+\usepackage{tipa}
+\usepackage{clrscode}
+\usepackage{setspace}
+\usepackage[absolute]{textpos} 
+
+%\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+\begin{document}
+
+
+%\setlength{\TPHorizModule}{200mm} 
+%\setlength{\TPVertModule}{100mm} 
+%\textblockorigin{61mm}{19mm}
+
+%\onehalfspace{}
+
+\providecommand{\OT}[1]{\operatorname{\Theta}\bigl(#1\bigr)}
+\providecommand{\OOm}[1]{\operatorname{\Omega}\bigl(#1\bigr)}
+
+\pagenumbering{arabic}
+
+\title{Team Nile 2017 D4 Project: \\Invention for Transporting Cargo \\using Helicopter Engineering kNowhow}
+\author{Your Name Here \\
+\\
+Technical Report\\
+\\
+Faculty of Engineering and Applied Science \\
+Department of Electronics and Computer Science
+}
+
+\date{\today}
+
+\maketitle
+
+
+\include{abstract}  
+{ }
+
+
+
+\include{license}
+
+\tableofcontents
+
+
+\chapter{Challenge Solution Statement} 
+\begin{itemize}
+\item Describe the specific challenge(s) that your Solution Concept addresses
+\item What is the specification that your team chose at the start of the design process?
+\item Be specific, it’s a specification.
+\end{itemize}
+
+\chapter{System Design } 
+\begin{itemize}
+\item Explain the design of your system, at a high level.
+\item Include a block diagram showing all of the subsystems and how they are connected.
+\item Why did you choose this particular architecture? What other options did you consider, and why did you reject them?
+
+\end{itemize}
+
+\chapter{Design Evaluation}
+\begin{itemize}
+\item How did your design match up against the criteria of 1) difficulty of the specification attempted, 2) quality of the electronic design, 3) ease of use, 4) creativity and innovation of the designed product, 5) aesthetics, 6) cost, and 7) reliability?
+\item You should evaluate it against each of these criteria, in separate paragraphs, followed by any additional criteria that you wish to include.
+
+\end{itemize}
+
+\chapter{Costing, Marketing and Conformance marking}
+ \begin{itemize}
+\item Provide details of each of these aspects.
+ \end{itemize}
+
+\chapter{Final Product} 
+\begin{itemize}
+\item Be critical, and compare your achievements against your specification
+-\item Include a photo(s) of the final product, and an explanation of how it works
+\item Discuss further extensions that could be made.
+
+\end{itemize}
+
+
+
+
+\appendix
+%\chapter{Test 3}
+%\chapter{Test 4 }
+\chapter{Appendix Title}
+\input{appendix}
+\chapter{Project Completion Form}
+\chapter{Circuit Diagrams}
+\chapter{Software Listings}
+\chapter{Project Meeting Agendas \& Minutes}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+
+
+
+
+
+
+\end{document}
