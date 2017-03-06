@@ -21,9 +21,10 @@
 #define INTERRUPT_PIN 2
 #define LED_PIN 13
 
-//#define LED_R 5
-//#define LED_G 6
-//#define LED_B 7 
+#define LED_Y 4
+#define LED_R 5
+#define LED_G 6
+#define LED_B 7 
 
 //pid definitions
 #define minPWM 2000
@@ -32,7 +33,7 @@
 
 MPU6050 mpu;
 HCMAX7219 HCMAX7219(LOAD);
-
+int ledState = 0;
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
 uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
@@ -80,9 +81,10 @@ void setup() {
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
-//  pinMode(LED_R, OUTPUT);
-//  pinMode(LED_B, OUTPUT);
-//  pinMode(LED_G, OUTPUT);
+    pinMode(LED_R, OUTPUT);
+  pinMode(LED_B, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+    pinMode(LED_Y, OUTPUT);
 
 
   roll_angle = 30;      // dummy inputs, when we're integrating modules
@@ -110,7 +112,7 @@ void setup() {
     
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu.dmpInitialize();
-
+   // mpu.setDLPFMode(0);
     // supply your own gyro offsets here, scaled for min sensitivity
     mpu.setXGyroOffset(220);
     mpu.setYGyroOffset(76);
@@ -147,10 +149,11 @@ void setup() {
 
 }
 
-
+unsigned long previousMillis = 1; 
 
 void loop() {
 unsigned long time;
+
 int yaw= (ypr[0] * 180/M_PI);
 
 roll_setpoint = 0;
@@ -184,14 +187,30 @@ right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
         else if (left_front < minPWM) left_front = minPWM;
 
     
-       int a=0;
-       Serial.print("program");
-       Serial.print("\n");
+       unsigned long currentMillis = millis();
+       const long interval = 1000; 
+
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED      
+
+    previousMillis = currentMillis;
+    ledState=!ledState;
+
+  }
+digitalWrite(LED_Y, ledState);
+    
+
+    
+       
+   //    Serial.print("program");
+ //      Serial.print("\n");
     
        HCMAX7219.Clear();
        HCMAX7219.print7Seg(yaw,8);
        HCMAX7219.Refresh();
+       digitalWrite(LED_B,HIGH);
 
+      
     mpuInterrupt = false;  // reset interrupt flag and get INT_STATUS byte
     mpuIntStatus = mpu.getIntStatus();
 
@@ -203,7 +222,7 @@ right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
     {  
         mpu.resetFIFO();   // reset so we can continue cleanly
         Serial.println(F("FIFO overflow!"));
-       // digitalWrite(LED_R, HIGH);
+        digitalWrite(LED_R, HIGH);
     }
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
@@ -226,11 +245,16 @@ right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
             Serial.println(ypr[2] * 180/M_PI);
 
             mpuIntStatus = mpu.getIntStatus();
-            Serial.print(mpuIntStatus);
+            //Serial.print(mpuIntStatus);
             Serial.print("\n");     
+
+            digitalWrite(LED_G,HIGH);
+            digitalWrite(LED_R,LOW);
+            digitalWrite(LED_B,LOW);
+            
     
-            time = millis();
-            Serial.println(time);
+            //time = millis();
+           // Serial.println(time);
 
     }
-}
+  }
