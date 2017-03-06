@@ -21,11 +21,6 @@ const attitude = {
 	pitch: 0,
 	yaw: 0
 };
-setInterval(() => {
-	attitude.pitch += 0.05;
-	attitude.roll += 0.05;
-	broadcast(attitude);
-}, 500);
 
 function broadcast(argument) {
 	wss.clients.forEach(client => {
@@ -37,10 +32,12 @@ function broadcast(argument) {
 // Open serial port at /dev/serial0
 const port = new SerialPort('/dev/serial0', {
 	baudRate: 115200,
-	parser: SerialPort.parsers.readline('\n')
+	parser: SerialPort.parsers.byteDelimiter([0x0A])
 });
 
 // broadcast all serial data
 port.on('data', data => {
-	broadcast(data);
+	console.log(data);
+	console.log(data.map((datum, i) => String.fromCharCode(data[i])));
+	//broadcast(JSON.parse(data));
 });
