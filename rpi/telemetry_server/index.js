@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const SerialPort = require('serialport');
+const UART = require('./uart_protocol.js');
 
 // serve files directly from /public 
 const app = express();
@@ -39,5 +40,6 @@ const port = new SerialPort('/dev/serial0', {
 port.on('data', data => {
 	console.log(data);
 	console.log(data.map((datum, i) => String.fromCharCode(data[i])));
+	console.log(UART.code_to_command(Buffer.from(data)));
 	//broadcast(JSON.parse(data));
 });
