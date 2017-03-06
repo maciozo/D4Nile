@@ -117,8 +117,8 @@ unsigned long time;
 int yar = (ypr[0] * 180/M_PI);
     
        int a=0;
-       Serial.print("program");
-       Serial.print("\n");
+     //  Serial.print("program");
+      // Serial.print("\n");
     
        HCMAX7219.Clear();
        HCMAX7219.print7Seg(yar,8);

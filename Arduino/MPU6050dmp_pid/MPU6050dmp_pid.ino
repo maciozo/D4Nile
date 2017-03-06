@@ -87,11 +87,11 @@ void setup() {
     pinMode(LED_Y, OUTPUT);
 
 
-  roll_angle = 30;      // dummy inputs, when we're integrating modules
+  //roll_angle = 30;      // dummy inputs, when we're integrating modules
   roll_setpoint = 0;    // these will be replaced by the outputs
-  pitch_angle = 25;     // from the Sensor and Pi_to_mc modules
+  //pitch_angle = 30;     // from the Sensor and Pi_to_mc modules
   pitch_setpoint = 0;
-  yall_angle = 35;
+  //yall_angle = 30;
   yall_setpoint = 0;
   
 //  roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);         This is for Ben's part for tunning
@@ -161,14 +161,16 @@ pitch_setpoint = 0;
 yall_setpoint = 0;
 altitude_coeff = 1;
 
-roll_angle = 30;
+  roll_angle = ypr[2] * 180/M_PI;    
+
+  pitch_angle = ypr[1] * 180/M_PI;  
+
+  yall_angle = ypr[0] * 180/M_PI;
+
 roll_PID.Compute();
-
-pitch_angle = 25;
 pitch_PID.Compute();
-
-yall_angle = 35;
 yall_PID.Compute();
+
 
 
 left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
@@ -176,15 +178,23 @@ right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
 left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
 right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
 
+
+
+
+       HCMAX7219.Clear();
+       HCMAX7219.print7Seg(yaw,8);
+       HCMAX7219.Refresh();
+       digitalWrite(LED_B,HIGH);
+       
 // set motor limits
-      if (right_back > maxPWM) right_back = maxPWM;
-        else if (right_back < minPWM) right_back = minPWM;                  
-      if (right_front > maxPWM) right_front = maxPWM;
-        else if (right_front < minPWM) right_front = minPWM;      
-      if (left_back > maxPWM) left_back = maxPWM;
-        else if (left_back < minPWM) left_back = minPWM;            
-      if (left_front > maxPWM) left_front = maxPWM;
-        else if (left_front < minPWM) left_front = minPWM;
+//      if (right_back > maxPWM) right_back = maxPWM;
+//        else if (right_back < minPWM) right_back = minPWM;                  
+//      if (right_front > maxPWM) right_front = maxPWM;
+//        else if (right_front < minPWM) right_front = minPWM;      
+//      if (left_back > maxPWM) left_back = maxPWM;
+//        else if (left_back < minPWM) left_back = minPWM;            
+//      if (left_front > maxPWM) left_front = maxPWM;
+//      else if (left_front < minPWM) left_front = minPWM;
 
     
        unsigned long currentMillis = millis();
@@ -205,10 +215,7 @@ digitalWrite(LED_Y, ledState);
    //    Serial.print("program");
  //      Serial.print("\n");
     
-       HCMAX7219.Clear();
-       HCMAX7219.print7Seg(yaw,8);
-       HCMAX7219.Refresh();
-       digitalWrite(LED_B,HIGH);
+
 
       
     mpuInterrupt = false;  // reset interrupt flag and get INT_STATUS byte
