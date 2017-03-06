@@ -87,7 +87,7 @@ void setup()
 void loop()
 {
 
-
+unsigned long time;
 
   
   // If intPin goes high, all data registers have new data
@@ -221,8 +221,8 @@ void loop()
         Serial.print(myIMU.pitch, 2);
         Serial.print(", ");
         Serial.println(myIMU.roll, 2);
-
-      
+        time = millis();
+        Serial.println(time);
 
       myIMU.count = millis();
       myIMU.sumCount = 0;
