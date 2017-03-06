@@ -38,8 +38,8 @@ const port = new SerialPort('/dev/serial0', {
 
 // broadcast all serial data
 port.on('data', data => {
-	console.log(data);
 	console.log(data.map((datum, i) => String.fromCharCode(data[i])));
-	console.log(UART.code_to_command(Buffer.from(data)));
-	//broadcast(JSON.parse(data));
+	const decoded = UART.code_to_command(Buffer.from(data));
+	attitude[decoded.command.toLowerCase()] = decoded.data;
+	broadcast(JSON.stringify(attitude));
 });

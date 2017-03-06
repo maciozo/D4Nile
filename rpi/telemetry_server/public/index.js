@@ -14,6 +14,7 @@ const messages_container = document.querySelector('#messages');
 socket.onmessage = event => {
 	console.log('received:', event.data);
 	attitude = JSON.parse(event.data);
+	console.log(attitude);
 	messages_container.innerHTML += `${event.data}\n`;
 }
 
