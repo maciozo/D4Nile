@@ -16,7 +16,7 @@ void dmpDataReady() {
 
 
 void setup() {
-
+  init_pwm();
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
@@ -31,10 +31,10 @@ void setup() {
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
-    pinMode(LED_R, OUTPUT);
-    pinMode(LED_B, OUTPUT);
-    pinMode(LED_G, OUTPUT);
-    pinMode(LED_Y, OUTPUT);
+  //  pinMode(LED_R, OUTPUT);
+  //  pinMode(LED_B, OUTPUT);
+  //  pinMode(LED_G, OUTPUT);
+  //  pinMode(LED_Y, OUTPUT);
 
   //roll_angle = 30;      // dummy inputs, when we're integrating modules
   roll_setpoint = 0;    // these will be replaced by the outputs
@@ -92,7 +92,7 @@ void setup() {
         
         Serial.print(devStatus);
         Serial.println(F(")"));
-        init_pwm();
+      
     }
 
 }
@@ -120,11 +120,11 @@ right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
 left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
 right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
 
-Serial.println(left_front);
+//Serial.println(left_front);
 
 int yaw= (ypr[0] * 180/M_PI);
-print_to_screen(yaw);
-digitalWrite(LED_B,HIGH);
+//print_to_screen(yaw);
+//digitalWrite(LED_B,HIGH);
        
 // set motor limits
       if (right_back > maxPWM) right_back = maxPWM;
@@ -137,11 +137,11 @@ digitalWrite(LED_B,HIGH);
       else if (left_front < minPWM) left_front = minPWM;
 
 change_pwm(left_front, left_back, right_front, right_back);
-
+Serial.println(OCR0A);
     
 
 
-    blink();
+//    blink();
 
     mpuInterrupt = false;  // reset interrupt flag and get INT_STATUS byte
     mpuIntStatus = mpu.getIntStatus();
@@ -152,7 +152,7 @@ change_pwm(left_front, left_back, right_front, right_back);
     {  
         mpu.resetFIFO();   // reset so we can continue cleanly
         Serial.println(F("FIFO overflow!"));
-        digitalWrite(LED_R, HIGH);
+  //      digitalWrite(LED_R, HIGH);
     }
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
@@ -178,18 +178,18 @@ change_pwm(left_front, left_back, right_front, right_back);
             //Serial.print(mpuIntStatus);
             Serial.print("\n");     
 
-            digitalWrite(LED_G,HIGH);
-            digitalWrite(LED_R,LOW);
-            digitalWrite(LED_B,LOW);
+            //digitalWrite(LED_G,HIGH);
+         //   digitalWrite(LED_R,LOW);
+           // digitalWrite(LED_B,LOW);
            
-            //time = millis();
-           // Serial.println(time);
+            unsigned long time = millis();
+            Serial.println(time);
 
     }
   }
 
 
-  
+  /*
 
   void print_to_screen(int value)
   {
@@ -209,4 +209,4 @@ change_pwm(left_front, left_back, right_front, right_back);
        }
     digitalWrite(LED_Y, ledState);
 }
-  
+  */
