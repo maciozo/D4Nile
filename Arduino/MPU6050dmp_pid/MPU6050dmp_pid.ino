@@ -56,9 +56,9 @@ double roll_angle, pitch_angle, yall_angle;
 double err_roll, err_pitch, err_yall;
 int left_front, right_front, left_back, right_back;
 
-double roll_kp=70, roll_ki=10, roll_kd=15;
-double pitch_kp=70, pitch_ki=10, pitch_kd=15;
-double yall_kp=70, yall_ki=10, yall_kd=15;
+double roll_kp=0.250, roll_ki=0.950, roll_kd=0.011;
+double pitch_kp=0.250, pitch_ki=0.950, pitch_kd=0.011;
+double yall_kp=0.680, yall_ki=0.500, yall_kd=0.0001;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -179,7 +179,7 @@ left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
 right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
 
 
-
+Serial.println(left_front);
 
        HCMAX7219.Clear();
        HCMAX7219.print7Seg(yaw,8);
