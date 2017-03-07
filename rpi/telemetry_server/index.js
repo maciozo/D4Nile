@@ -3,6 +3,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const SerialPort = require('serialport');
 const UART = require('./uart_protocol.js');
+const joystick = require('joystick');
 
 // serve files directly from /public 
 const app = express();
@@ -42,4 +43,17 @@ port.on('data', data => {
 	const decoded = UART.code_to_command(Buffer.from(data));
 	attitude[decoded.command.toLowerCase()] = decoded.data;
 	broadcast(JSON.stringify(attitude));
+});
+
+const controller = new joystick(0,3500,350);
+controller.on('axis', data => {
+	if (data.number == 2) {
+		let angle = (data.value/32768)*0.17;
+		attitude.roll = angle;
+		broadcast(attitude);
+	} else if (data.number == 5) {
+		let angle = (data.value/32768)*0.17;
+		attitude.pitch = angle;
+		broadcast(attitude);
+	}
 });

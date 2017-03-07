@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.0",
+    "joystick": "^0.1.2",
     "serialport": "^4.0.7",
     "ws": "^2.2.0"
   }
