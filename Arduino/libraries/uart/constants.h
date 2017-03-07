@@ -1,9 +1,6 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
-    /* Baud rate between RPi and Seeeduino */
-    #define UART_BAUD 115200
-
 /* ==============================MC -> Pi UART Protocol===================== */
 
     /* Accelerometer data */
