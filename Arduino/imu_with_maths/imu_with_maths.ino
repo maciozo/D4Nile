@@ -1,10 +1,30 @@
 #include "quaternionFilters.h"
 #include "MPU9250.h"
+#include <PID_v1.h>
 
 int intPin = 12;  // These can be changed, 2 and 3 are the Arduinos ext int pins
 //int myLed  = 13;  // Set up pin 13 led for toggling
 
+//pid definitions
+#define minPWM 2000
+#define maxPWM 4000
+#define thrust 3000
+
 MPU9250 myIMU;
+
+double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
+double roll_angle, pitch_angle, yall_angle;
+double err_roll, err_pitch, err_yall;
+int left_front, right_front, left_back, right_back;
+
+double roll_kp=70, roll_ki=10, roll_kd=15;
+double pitch_kp=70, pitch_ki=10, pitch_kd=15;
+double yall_kp=70, yall_ki=10, yall_kd=15;
+
+PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
+PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
+PID yall_PID(&yall_angle, &err_yall, &yall_setpoint, yall_kp, yall_ki, yall_kd, DIRECT);
+
 
 void setup()
 {
@@ -18,7 +38,21 @@ void setup()
   //pinMode(myLed, OUTPUT);
   //digitalWrite(myLed, HIGH);
 
-
+  roll_angle = 30;      // dummy inputs, when we're integrating modules
+  roll_setpoint = 0;    // these will be replaced by the outputs
+  pitch_angle = 25;     // from the Sensor and Pi_to_mc modules
+  pitch_setpoint = 0;
+  yall_angle = 35;
+  yall_setpoint = 0;
+  
+//  roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);         This is for Ben's part for tunning
+//  pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);     the PID values via the web server
+//  yall_PID.SetTunings(yall_kp, yall_ki, yall_kd);
+  
+  roll_PID.SetMode(AUTOMATIC);
+  pitch_PID.SetMode(AUTOMATIC);
+  yall_PID.SetMode(AUTOMATIC);
+  
 
   // Read the WHO_AM_I register, this is a good test of communication
   byte c = myIMU.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);
@@ -86,14 +120,43 @@ void setup()
 
 void loop()
 {
-
+Serial.print("program");
 unsigned long time;
+roll_setpoint = 0;
+pitch_setpoint = 0;
+yall_setpoint = 0;
+altitude_coeff = 1;
 
+roll_angle = 30;
+roll_PID.Compute();
+
+pitch_angle = 25;
+pitch_PID.Compute();
+
+yall_angle = 35;
+yall_PID.Compute();
+
+
+left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
+left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
+right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+
+// set motor limits
+      if (right_back > maxPWM) right_back = maxPWM;
+        else if (right_back < minPWM) right_back = minPWM;                  
+      if (right_front > maxPWM) right_front = maxPWM;
+        else if (right_front < minPWM) right_front = minPWM;      
+      if (left_back > maxPWM) left_back = maxPWM;
+        else if (left_back < minPWM) left_back = minPWM;            
+      if (left_front > maxPWM) left_front = maxPWM;
+        else if (left_front < minPWM) left_front = minPWM;
+        
   
   // If intPin goes high, all data registers have new data
   // On interrupt, check if data ready interrupt
-  if (myIMU.readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
-  {  
+  //if (myIMU.readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
+ // {  
     myIMU.readAccelData(myIMU.accelCount);  // Read the x/y/z adc values
     myIMU.getAres();
 
@@ -132,7 +195,7 @@ unsigned long time;
                myIMU.magbias[1];
     myIMU.mz = (float)myIMU.magCount[2]*myIMU.mRes*myIMU.magCalibration[2] -
                myIMU.magbias[2];
-  } // if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
+ // } // if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
 
   // Must be called before updating quaternions!
   myIMU.updateTime();
