@@ -2,7 +2,7 @@
 #include "commandData.h"
 #include "constants.h"
 #include "pid.h"
-#include "sensors.h"
+#include "sensor.h"
 #include "main.h"
 
 void setup(void)
@@ -14,7 +14,9 @@ void setup(void)
     uartInit(void);
     uartSendCommand(STATUS, INITIALISING);
     
-    sensorInit(void);
+    init_pwm();
+    init_sensor();
+    init_pid();
     
     uartSendCommand(STATUS, READY);
 }
