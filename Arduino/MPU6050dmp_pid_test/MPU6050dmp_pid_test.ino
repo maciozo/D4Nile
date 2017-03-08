@@ -1,20 +1,32 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
-#include <HCMAX7219.h>
-#include "SPI.h"
+
 #include "definitions.h"
 #include <PID_v1.h>
-#include "PWM_functions.h"
 
 #define JOYSTICK_1_X A0
 #define JOYSTICK_1_Y A1
 #define JOYSTICK_2_X A2
 #define JOYSTICK_2_Y A3
 
+//#define PWM
+#define DISPLAY
+
+#ifdef DISPLAY
+  #include <HCMAX7219.h>
+  #include "SPI.h"
+  #define LOAD 10
+  HCMAX7219 HCMAX7219(LOAD);
+#endif
+
+#ifdef PWM
+  #include "PWM_functions.h"
+#endif
+
 int VAL_1_X, VAL_1_Y, VAL_2_X, VAL_2_Y;
 
-PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
-PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
+PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, REVERSE);
+PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, REVERSE);
 PID yall_PID(&yall_angle, &err_yall, &yall_setpoint, yall_kp, yall_ki, yall_kd, DIRECT);
 
 void dmpDataReady() {
@@ -23,7 +35,11 @@ void dmpDataReady() {
 
 
 void setup() {
+#ifdef PWM
   init_pwm();
+#endif
+
+
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
@@ -106,13 +122,26 @@ void setup() {
 
 
 
-
 void loop() {
+if (Serial.available() > 0) {
+    int data = Serial.read()-48;
+   // Serial.readBytes(buffer, length)
+    Serial.print(data);
+    #ifdef DISPLAY
+           HCMAX7219.Clear();
+           HCMAX7219.print7Seg(data,8);
+           HCMAX7219.Refresh(); 
+    #endif
+    }
+ 
 
   VAL_1_X = analogRead(JOYSTICK_1_X);
   VAL_1_Y = analogRead(JOYSTICK_1_Y);
   VAL_2_X = analogRead(JOYSTICK_2_X);
   VAL_2_Y = analogRead(JOYSTICK_2_Y);
+
+
+       
 /*
   Serial.println(VAL_1_X); Serial.print("\t");
   Serial.print(VAL_1_Y); Serial.print("\t");
@@ -154,13 +183,16 @@ int yaw= (ypr[0] * 180/M_PI);
       if (left_front > maxPWM) left_front = maxPWM;
       else if (left_front < minPWM) left_front = minPWM;
 
-change_pwm(left_front, left_back, right_front, right_back);
+#ifdef PWM
+  change_pwm(left_front, left_back, right_front, right_back);
+#endif
 
+/*
 Serial.println(OCR0A); Serial.print("\t");
 Serial.print(OCR0B); Serial.print("\t");
 Serial.print(OCR2A); Serial.print("\t");
 Serial.print(OCR2B); Serial.print("\t");
-
+*/
 
 //    blink();
 
@@ -203,8 +235,8 @@ Serial.print(OCR2B); Serial.print("\t");
          //   digitalWrite(LED_R,LOW);
            // digitalWrite(LED_B,LOW);
            
-            //unsigned long time = millis();
-            //Serial.println(time);
+         //   unsigned long time = millis();
+          //  Serial.println(time);
 
     }
   }

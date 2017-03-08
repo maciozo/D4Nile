@@ -11,6 +11,7 @@ typedef struct
   int16_t pitch_forward;
   int16_t mode_button;
   int16_t servo_button;
+  int16_t autoland;
 } commanddata_t;
 
 int formatData(commanddata_t* commandData, char* rawdata);

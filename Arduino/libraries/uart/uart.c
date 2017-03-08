@@ -1,5 +1,5 @@
 #include "uart.h"
-#include "constants.h"
+#include "../../../constants.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -67,7 +67,6 @@ void uartSendCommand(uint8_t command, int16_t data)
     toSend[1] = (char)(data >> 8);
     toSend[2] = (char)(data);
     toSend[3] = '\n';
-    toSend[4] = '\0';
     
     uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
     

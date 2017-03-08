@@ -1,8 +1,8 @@
 #ifndef UART_H
 #define UART_H
 
-#define MC_RECVBUFFER_SIZE 5
-#define MC_SENDBUFFER_SIZE 5
+#define MC_RECVBUFFER_SIZE 6
+#define MC_SENDBUFFER_SIZE 4
 
 #define BAUDRATE 115200
 

@@ -1,5 +1,5 @@
 #include "commandData.h"
-#include "constants.h"
+#include "../../../constants.h"
 
 int formatData(commanddata_t* commandData, char* rawdata)
 {
@@ -24,6 +24,9 @@ int formatData(commanddata_t* commandData, char* rawdata)
             break;
         case SERVO_BUTTON:
             commandData->servo_button = tempData;
+            break;
+        case AUTOLAND:
+            commandData->autoland = tempData;
             break;
         default:
             return 1;

@@ -55,7 +55,7 @@
     /* Buttons */
     #define MODE_BUTTON 0x24
     #define SERVO_BUTTON 0x25
-    #define AUTO_LAND 0x26
+    #define AUTOLAND 0x26
 
 /* ========================================================================== */
 
