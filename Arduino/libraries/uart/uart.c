@@ -59,14 +59,16 @@ void uartSendRaw(char* string, unsigned int length)
     return;
 }
 
-void uartSendCommand(uint8_t command, int16_t data)
+void uartSendCommand(uint8_t command, float data)
 {
     char toSend[MC_SENDBUFFER_SIZE];
     
     toSend[0] = (char)command;
-    toSend[1] = (char)(data >> 8);
-    toSend[2] = (char)(data);
-    toSend[3] = '\n';
+    toSend[1] = (char)((data >> 24));
+    toSend[2] = (char)((data >> 16) & 0x000F);
+    toSend[3] = (char)((data >>  8) & 0x000F);
+    toSend[4] = (char)((data >>  0) & 0x000F);
+    toSend[5] = '\n';
     
     uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
     
