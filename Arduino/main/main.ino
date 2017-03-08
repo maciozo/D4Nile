@@ -7,19 +7,21 @@
 
 void setup(void)
 {
-    commanddata_t target_values = {0};
-    commanddata_t sensor_data = {0};
-    commanddata_t old_sensor_data = sensor_data;
+    target_values = {0};
+    sensor_data = {0};
+    old_sensor_data = {0};
     
     uartInit(void);
-    uartSendCommand(INITIALISISNG, 1.0);
+    uartSendCommand(STATUS, INITIALISING);
     
     sensorInit(void);
+    
+    uartSendCommand(STATUS, READY);
 }
 
 void loop(void)
 {
-    
+    sendNewSensorData(sensor_data, old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
@@ -66,4 +68,6 @@ void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_dat
         uartSendCommand(AUTOLAND, sensor_data->autoland);
         old_sensor_data->autoland = sensor_data->autoland;
     }
+    
+    return void;
 }

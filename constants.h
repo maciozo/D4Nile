@@ -20,8 +20,9 @@
     #define AUTOLAND 0x26
     
     /* Meta */
-    #define INITIALISING 0x27
-    #define READY 0x28
+    #define STATUS 0x27
+    #define READY 0.0
+    #define INITIALISING 1.0
 
 /* ========================================================================== */
 
