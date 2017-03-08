@@ -21,7 +21,20 @@ void setup(void)
 
 void loop(void)
 {
+    /* Send any sensor values that have changed since they were last sent */
     sendNewSensorData(sensor_data, old_sensor_data);
+    
+    /* Get current values from sensors */
+    getSensorValues(&sensor_data);
+    
+    /* Get command from UART */
+    uartReadRaw(recvBuffer, MC_RECVBUFFER_SIZE);
+    
+    /* Put the new command in to the target_values struct */
+    formatData(&target_values, recvBuffer);
+    
+    /* Do PID calculations to get the real sensor values towards the target values */
+    pid(&sensor_data, &target_values);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
