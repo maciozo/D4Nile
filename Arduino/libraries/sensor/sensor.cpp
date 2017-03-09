@@ -1,6 +1,7 @@
 #include "sensor.h"
 #include "PID_v1.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include "MPU6050.h"
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -17,12 +18,12 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-
+int16_t gx, gy, gz;
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
 
 double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
-double roll_angle, pitch_angle, yall_angle;
+double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
 int left_front, right_front, left_back, right_back;
 
@@ -32,7 +33,7 @@ double yall_kp=2, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
-PID yall_PID(&yall_angle, &err_yall, &yall_setpoint, yall_kp, yall_ki, yall_kd, DIRECT);
+PID yall_PID(&yall_angular_vel, &err_yall, &yall_setpoint, yall_kp, yall_ki, yall_kd, DIRECT);
 
 
 void init_sensor()
@@ -44,7 +45,7 @@ void init_sensor()
         Fastwire::setup(400, true);
   #endif
 
-    //Serial.begin(115200);
+    Serial.begin(115200);
     while (!Serial)
 
     // initialize device
@@ -127,7 +128,7 @@ void dmpDataReady()
 void do_everything(float* data)
 {
 
-Serial.println("do evetything loop");
+//Serial.println("do evetything loop");
 roll_setpoint = 0;
 pitch_setpoint = 0;
 yall_setpoint = 0;
@@ -135,7 +136,8 @@ altitude_coeff = 1;
 
 roll_angle = ypr[2] * 180/M_PI;    
 pitch_angle = ypr[1] * 180/M_PI;  
-yall_angle = ypr[0] * 180/M_PI;
+yall_angular_vel = gz/728;
+
 
 roll_PID.Compute();
 pitch_PID.Compute();
@@ -148,7 +150,7 @@ right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
 
 //Serial.println(left_front);
 
-int yaw= (ypr[0] * 180/M_PI);
+//int yaw= (ypr[0] * 180/M_PI);
 
        
 // set motor limits
@@ -162,7 +164,7 @@ int yaw= (ypr[0] * 180/M_PI);
       else if (left_front < minPWM) left_front = minPWM;
 
 change_pwm(left_front, left_back, right_front, right_back);
-Serial.println(OCR0A);
+
     
 
 
@@ -190,29 +192,34 @@ Serial.println(OCR0A);
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-      
-            Serial.print("ypr\t");
+            mpu.getRotation(&gx, &gy, &gz);
+/*
+            Serial.println("ypr\t");
             Serial.print(ypr[0] * 180/M_PI);
             Serial.print("\t");
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print("\t");
-            Serial.println(ypr[2] * 180/M_PI);
+            Serial.print(ypr[2] * 180/M_PI);
+            Serial.print("\t");   */
+            Serial.println(gz/728);
+
 
             mpuIntStatus = mpu.getIntStatus();
             //Serial.print(mpuIntStatus);
-            Serial.print("\n");     
+           // Serial.print("\n");     
 
 
            
-            unsigned long time = millis();
-            Serial.println(time);
+            //unsigned long time = millis();
+            //Serial.println(time);
 
     }
 
-    for(int i=0;i<3;i++)
-    {
-        data[i]=ypr[i]* 180/M_PI;
-    }
+
+    data[0]=gz/728;
+    data[1]=ypr[1]* 180/M_PI;
+    data[2]=ypr[2]* 180/M_PI;
+    
 }
 
 
