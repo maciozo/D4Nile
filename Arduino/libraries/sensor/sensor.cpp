@@ -124,7 +124,7 @@ void dmpDataReady()
 }
 
 
-void do_everything()
+void do_everything(float* data)
 {
 
 Serial.println("do evetything loop");
@@ -207,6 +207,11 @@ Serial.println(OCR0A);
             unsigned long time = millis();
             Serial.println(time);
 
+    }
+
+    for(int i=0;i<3;i++)
+    {
+        data[i]=ypr[i]* 180/M_PI;
     }
 }
 
