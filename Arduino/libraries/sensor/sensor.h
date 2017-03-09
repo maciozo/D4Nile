@@ -13,7 +13,7 @@
 void init_sensor();
 void init_pid();
 void do_everything(float* data);
-void dmpDataReady();
+void do_everything(commanddata_t* sensor_data, commanddata_t* target_values);
 void init_pwm(void);
 void change_pwm(int left_front, int left_back, int right_front, int right_back);
 

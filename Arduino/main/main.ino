@@ -1,7 +1,6 @@
 #include "uart.h"
 #include "commandData.h"
 #include "constants.h"
-#include "pid.h"
 #include "sensor.h"
 #include "main.h"
 
@@ -11,7 +10,7 @@ void setup(void)
     sensor_data = {0};
     old_sensor_data = {0};
     
-    uartInit(void);
+    uartInit();
     uartSendCommand(STATUS, INITIALISING);
     
     init_pwm();
@@ -33,7 +32,7 @@ void loop(void)
     do_everything(&sensor_data, &target_values);
     
     /* Send any sensor values that have changed since they were last sent */
-    sendNewSensorData(sensor_data, old_sensor_data);
+    sendNewSensorData(&sensor_data, &old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
@@ -81,5 +80,5 @@ void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_dat
         old_sensor_data->autoland = sensor_data->autoland;
     }
     
-    return void;
+
 }
