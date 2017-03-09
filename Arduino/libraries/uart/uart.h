@@ -29,7 +29,7 @@ void uartInit(void);
     char* string: string to be sent
     unsigned int length: length of the string, including '\0'. Will stop sending on '\0'.
 */
-void uartSendRaw(char* string, unsigned int length);
+void uartSendRaw(unsigned char* string, unsigned int length);
 
 /* Send telemetry data over UART.
     uint8_t command: What the data is describing. Refer to constants.h
