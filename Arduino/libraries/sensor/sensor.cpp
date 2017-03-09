@@ -20,7 +20,6 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
-
 double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
 double roll_angle, pitch_angle, yall_angle;
 double err_roll, err_pitch, err_yall;
@@ -37,29 +36,20 @@ PID yall_PID(&yall_angle, &err_yall, &yall_setpoint, yall_kp, yall_ki, yall_kd, 
 
 void init_sensor()
 {
-  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-  #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
-  #endif
+    #endif
 
-    //Serial.begin(115200);
-    while (!Serial)
-
-    // initialize device
-    Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
-        // verify connection
-    Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+    // verify connection
     uint8_t test_whoami_reg = mpu.testConnection();
-    Serial.println(test_whoami_reg);
-    
-    Serial.println(F("Initializing DMP..."));
+
     devStatus = mpu.dmpInitialize();
-   // mpu.setDLPFMode(0);
+    // mpu.setDLPFMode(0);
     // supply your own gyro offsets here, scaled for min sensitivity
     mpu.setXGyroOffset(220);
     mpu.setYGyroOffset(76);
@@ -67,18 +57,15 @@ void init_sensor()
     mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
-    if (devStatus == 0) {
-      
-        Serial.println(F("Enabling DMP..."));
+    if (devStatus == 0) 
+    {
         mpu.setDMPEnabled(true);
 
         // enable Arduino interrupt detection
-        Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
         attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
         mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
-        Serial.println(F("DMP ready! Waiting for first interrupt..."));
         dmpReady = true;
 
         // get expected DMP packet size for later comparison
@@ -88,34 +75,27 @@ void init_sensor()
         // 1 = initial memory load failed
         // 2 = DMP configuration updates failed
         // (if it's going to break, usually the code will be 1)
-        Serial.print(F("DMP Initialization failed (code "));
-        
-        Serial.print(devStatus);
-        Serial.println(F(")"));
-      
+        // Serial.print(F("DMP Initialization failed (code "));
+
+        // Serial.print(devStatus);
+        // Serial.println(F(")"));
     }
-  
-  
 }
 
 
 
 void init_pid()
 {
-  roll_setpoint = 0;    // these will be replaced by the outputs
-  pitch_setpoint = 0;
-  yall_setpoint = 0;
-  
-//  roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);         This is for Ben's part for tunning
-//  pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);     the PID values via the web server
-//  yall_PID.SetTunings(yall_kp, yall_ki, yall_kd);
-  Serial.println("pid1");
-  roll_PID.SetMode(AUTOMATIC);
-  Serial.println("pid2");
-  pitch_PID.SetMode(AUTOMATIC);
-  Serial.println("pid3");
-  yall_PID.SetMode(AUTOMATIC);
+    roll_setpoint = 0;    // these will be replaced by the outputs
+    pitch_setpoint = 0;
+    yall_setpoint = 0;
 
+    //  roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);         This is for Ben's part for tunning
+    //  pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);     the PID values via the web server
+    //  yall_PID.SetTunings(yall_kp, yall_ki, yall_kd);
+    roll_PID.SetMode(AUTOMATIC);
+    pitch_PID.SetMode(AUTOMATIC);
+    yall_PID.SetMode(AUTOMATIC);
 }
 
 void dmpDataReady() 
@@ -123,100 +103,79 @@ void dmpDataReady()
     mpuInterrupt = true;
 }
 
-
-<<<<<<< HEAD
 void do_everything(commanddata_t* setpoints)
-=======
-void do_everything(float* data)
->>>>>>> refs/remotes/origin/sensors
 {
+    roll_setpoint = setpoints->roll_left;
+    pitch_setpoint = setpoints->pitch_forward;
+    yall_setpoint = setpoints->yaw_ccw;
+    altitude_coeff = setpoints->throttle_up;
 
-Serial.println("do evetything loop");
+    roll_angle = ypr[2] * 180/M_PI;    
+    pitch_angle = ypr[1] * 180/M_PI;  
+    yall_angle = ypr[0] * 180/M_PI;
 
-roll_setpoint = setpoints->roll_left;
-pitch_setpoint = setpoints->pitch_forward;
-yall_setpoint = setpoints->yaw_ccw;
-altitude_coeff = setpoints->throttle_up;
+    roll_PID.Compute();
+    pitch_PID.Compute();
+    yall_PID.Compute();
 
-roll_angle = ypr[2] * 180/M_PI;    
-pitch_angle = ypr[1] * 180/M_PI;  
-yall_angle = ypr[0] * 180/M_PI;
+    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
+    left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
+    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
 
-roll_PID.Compute();
-pitch_PID.Compute();
-yall_PID.Compute();
+    int yaw = (ypr[0] * 180/M_PI);
 
-left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
-
-//Serial.println(left_front);
-
-int yaw= (ypr[0] * 180/M_PI);
-
-       
-// set motor limits
-      if (right_back > maxPWM) right_back = maxPWM;
-        else if (right_back < minPWM) right_back = minPWM;                  
-      if (right_front > maxPWM) right_front = maxPWM;
-        else if (right_front < minPWM) right_front = minPWM;      
-      if (left_back > maxPWM) left_back = maxPWM;
-        else if (left_back < minPWM) left_back = minPWM;            
-      if (left_front > maxPWM) left_front = maxPWM;
-      else if (left_front < minPWM) left_front = minPWM;
-
-change_pwm(left_front, left_back, right_front, right_back);
-Serial.println(OCR0A);
+    // set motor limits
+    if      (right_back > maxPWM) right_back = maxPWM;
+    else if (right_back < minPWM) right_back = minPWM;           
     
+    if      (right_front > maxPWM) right_front = maxPWM;
+    else if (right_front < minPWM) right_front = minPWM;   
+    
+    if      (left_back > maxPWM) left_back = maxPWM;
+    else if (left_back < minPWM) left_back = minPWM;       
+    
+    if      (left_front > maxPWM) left_front = maxPWM;
+    else if (left_front < minPWM) left_front = minPWM;
 
-
+    change_pwm(left_front, left_back, right_front, right_back);
 
     mpuInterrupt = false;  // reset interrupt flag and get INT_STATUS byte
     mpuIntStatus = mpu.getIntStatus();
-    
+
     fifoCount = mpu.getFIFOCount();   // get current FIFO count
 
     if ((mpuIntStatus & 0x10) || fifoCount == 1024)  // check for overflow
     {  
         mpu.resetFIFO();   // reset so we can continue cleanly
-        Serial.println(F("FIFO overflow!"));
-
     }
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
-    
-   else if (mpuIntStatus & 0x02) 
-   {
+
+    else if (mpuIntStatus & 0x02) 
+    {
         while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount(); // wait for correct available data length, should be a VERY short wait
         mpu.getFIFOBytes(fifoBuffer, packetSize); // read a packet from FIFO
         fifoCount -= packetSize;  // track FIFO count here in case there is > 1 packet available
 
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-      
-            Serial.print("ypr\t");
-            Serial.print(ypr[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.println(ypr[2] * 180/M_PI);
+        mpu.dmpGetQuaternion(&q, fifoBuffer);
+        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
 
-            mpuIntStatus = mpu.getIntStatus();
-            //Serial.print(mpuIntStatus);
-            Serial.print("\n");     
+        Serial.print("ypr\t");
+        Serial.print(ypr[0] * 180/M_PI);
+        Serial.print("\t");
+        Serial.print(ypr[1] * 180/M_PI);
+        Serial.print("\t");
+        Serial.println(ypr[2] * 180/M_PI);
 
-
-           
-            unsigned long time = millis();
-            Serial.println(time);
-
+        mpuIntStatus = mpu.getIntStatus();
+        unsigned long time = millis();
     }
 
     for(int i=0;i<3;i++)
     {
-        data[i]=ypr[i]* 180/M_PI;
+        data[i] = ypr[i]* 180/M_PI;
     }
 }
 
@@ -224,33 +183,32 @@ Serial.println(OCR0A);
 
 void init_pwm(void)
 {
-	   Serial.print("init_pwm");
-		//set output pins for OCRs
-        DDRB |= _BV(PB3);
-        DDRD |= _BV(PD5);
-        DDRD |= _BV(PD6);
-        DDRD |= _BV(PD3);
+    //set output pins for OCRs
+    DDRB |= _BV(PB3);
+    DDRD |= _BV(PD5);
+    DDRD |= _BV(PD6);
+    DDRD |= _BV(PD3);
 
-        //set non-inverting mode fast PWM with top value 0xFF (not OCR)
-        TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
-        TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
+    //set non-inverting mode fast PWM with top value 0xFF (not OCR)
+    TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
+    TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
 
-        //select clock to give prescaler 256, giving a frequency of --Hz
-        TCCR0B = _BV(CS02);
-        TCCR2B = _BV(CS22) | _BV(CS21);
+    //select clock to give prescaler 256, giving a frequency of --Hz
+    TCCR0B = _BV(CS02);
+    TCCR2B = _BV(CS22) | _BV(CS21);
 
-        //set initial value for OCRs
-        OCR0A = 62;
-        OCR0B = 62;
-        OCR2A = 62;
-        OCR2B = 62;
+    //set initial value for OCRs
+    OCR0A = 62;
+    OCR0B = 62;
+    OCR2A = 62;
+    OCR2B = 62;
 }
 
 void change_pwm(int left_front, int left_back, int right_front, int right_back)
 {
-	   OCR0A = left_front/33;		//divide input by 33 to put it in duty cycle range
-	   OCR0B = left_back/33;
-	   OCR2A = right_front/33;
-	   OCR2B = right_back/33;
+    OCR0A = left_front/33;		//divide input by 33 to put it in duty cycle range
+    OCR0B = left_back/33;
+    OCR2A = right_front/33;
+    OCR2B = right_back/33;
 }
 
