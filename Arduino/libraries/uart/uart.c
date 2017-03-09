@@ -62,10 +62,6 @@ void uartSendRaw(unsigned char* string, unsigned int length)
 void uartSendCommand(uint8_t command, float data)
 {
     unsigned char toSend[MC_SENDBUFFER_SIZE];
-<<<<<<< HEAD
-=======
-    int32_t floatToLong = *(int32_t*)*&data;
->>>>>>> origin/integration
     unsigned char *floatToChar = reinterpret_cast<unsigned char*>(&data);
     
     toSend[0] = (unsigned char)command;
