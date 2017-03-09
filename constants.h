@@ -1,6 +1,9 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
+    /* Include variables for tuning PID gain the the commandData struct */
+    #define GAIN_TUNING
+
     /* Baud rate between RPi and Seeeduino */
     #define UART_BAUD 115200
 
@@ -23,6 +26,17 @@
     #define STATUS 0x27
     #define READY 0.0
     #define INITIALISING 1.0
+    
+    /* Mad gains */
+    #define ROLL_KP 0x28
+    #define ROLL_KI 0x29
+    #define ROLL_KD 0x2A
+    #define PITCH_KP 0x2B
+    #define PITCH_KI 0x2C
+    #define PITCH_KD 0x2D
+    #define YAW_KP 0x2E
+    #define YAW_KI 0x2F
+    #define YAW_KD 0x30
 
 /* ========================================================================== */
 
