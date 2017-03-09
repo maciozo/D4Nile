@@ -124,7 +124,11 @@ void dmpDataReady()
 }
 
 
+<<<<<<< HEAD
 void do_everything(commanddata_t* setpoints)
+=======
+void do_everything(float* data)
+>>>>>>> refs/remotes/origin/sensors
 {
 
 Serial.println("do evetything loop");
@@ -208,6 +212,11 @@ Serial.println(OCR0A);
             unsigned long time = millis();
             Serial.println(time);
 
+    }
+
+    for(int i=0;i<3;i++)
+    {
+        data[i]=ypr[i]* 180/M_PI;
     }
 }
 
