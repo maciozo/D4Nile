@@ -1,9 +1,9 @@
 #include "commandData.h"
-#include "constants.h"
+#include "../../../constants.h"
 
 int formatData(commanddata_t* commandData, char* rawdata)
 {
-    int16_t tempData = (rawdata[1] << 8) | rawdata[2];
+    float tempData = (rawdata[1] << 24) | (rawdata[2] << 16) | (rawdata[3] << 8) | (rawdata[4]);
     switch (rawdata[0])
     {
         case YAW_CCW:
@@ -24,6 +24,9 @@ int formatData(commanddata_t* commandData, char* rawdata)
             break;
         case SERVO_BUTTON:
             commandData->servo_button = tempData;
+            break;
+        case AUTOLAND:
+            commandData->autoland = tempData;
             break;
         default:
             return 1;

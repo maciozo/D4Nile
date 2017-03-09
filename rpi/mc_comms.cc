@@ -31,17 +31,13 @@ void uartClose(FILE* uartDevice)
     fclose(uartDevice);
 }
 
-int uartSendRaw(char* string, FILE* uartDevice)
+int uartSendRaw(FILE* uartDevice, char* string, size_t length)
 {
-    if (strlen(string) > SENDBUFFER_SIZE)
-    {
-        return 1;
-    }
-    fwrite(string, sizeof(char), SENDBUFFER_SIZE, uartDevice);
+    fwrite(string, sizeof(char), length, uartDevice);
     return 0;
 }
 
-int uartSendCommand(uint8_t command, int16_t data, FILE* uartDevice)
+int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
 {
     char toSend[5];
     if ((command < 0x20) | (command > RECV_MAX))
@@ -60,14 +56,14 @@ int uartSendCommand(uint8_t command, int16_t data, FILE* uartDevice)
     toSend[3] = (char)'\n';
     toSend[4] = (char)'\0';
     
-    uartSendRaw(toSend, uartDevice);
+    uartSendRaw(toSend, uartDevice, 5);
     
     return 0;
 }
 
-int uartReadRaw(FILE* uartDevice, char* recvBuffer)
+int uartReadRaw(FILE* uartDevice, char* recvBuffer, size_t length)
 {    
-    if (fgets(recvBuffer, RECVBUFFER_SIZE, uartDevice) != NULL)
+    if (fgets(recvBuffer, length, uartDevice) != NULL)
     {
         return 0;
     }

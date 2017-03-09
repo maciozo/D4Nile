@@ -1,25 +1,20 @@
 #include "uart.h"
-#include "commandData.h"
+#include "../commandData/commandData.h"
 
 #include <stdio.h>
 
-void setup()
-{
-    // char string[10] = "testing!\n";
-    uartInit();
-    // uartSendRaw(string, 10);
-}
-
-void loop()
+int main(void)
 {
     char recvBuffer[5];
     commanddata_t commandData = {0};
+    uartInit();
     while (1)
     {
         dumpCommandData(&commandData);
         uartReadRaw(recvBuffer, 5);
         formatData(&commandData, recvBuffer);
     }
+    return 0;
 }
 
 void dumpCommandData(commanddata_t* commandData)

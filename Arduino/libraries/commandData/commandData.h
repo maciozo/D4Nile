@@ -5,12 +5,13 @@
 
 typedef struct
 {
-  int16_t yaw_ccw;
-  int16_t throttle_up;
-  int16_t roll_left;
-  int16_t pitch_forward;
-  int16_t mode_button;
-  int16_t servo_button;
+  float yaw_ccw;
+  float throttle_up;
+  float roll_left;
+  float pitch_forward;
+  float mode_button;
+  float servo_button;
+  float autoland;
 } commanddata_t;
 
 int formatData(commanddata_t* commandData, char* rawdata);
