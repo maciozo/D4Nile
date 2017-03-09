@@ -32,9 +32,9 @@ add_lights_to_scene(scene);
 (function render() {
 	requestAnimationFrame(render);
 	if (quad) {
-		quad.rotation.x = attitude.pitch;
-		quad.rotation.y = attitude.yaw;
-		quad.rotation.z = attitude.roll;
+		quad.rotation.x = attitude.pitch * (Math.PI/180);
+		quad.rotation.y = attitude.yaw * (Math.PI/180);
+		quad.rotation.z = attitude.roll * (Math.PI/180);
 	}
 	renderer.render(scene, camera);
 })();

@@ -57,6 +57,42 @@ function command_to_code(command, data) {
 			buf.writeUInt8(0x21, 0);
 			buf.writeFloatLE(data, 1);
 			break;
+		case 'ROLL_KP':
+			buf.writeUInt8(0x28,0); // TODO: work out opcodes for PID commands
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'ROLL_KI':
+			buf.writeUInt8(0x29,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'ROLL_KD':
+			buf.writeUInt8(0x2A,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'PITCH_KP':
+			buf.writeUInt8(0x2B,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'PITCH_KI':
+			buf.writeUInt8(0x2C,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'PITCH_KD':
+			buf.writeUInt8(0x2D,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'YAW_KP':
+			buf.writeUInt8(0x2E,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'YAW_KI':
+			buf.writeUInt8(0x2F,0);
+			buf.writeFloatLE(data, 1);
+			break;
+		case 'YAW_KD':
+			buf.writeUInt8(0x30,0);
+			buf.writeFloatLE(data, 1);
+			break;
 		default: 
 			console.log('Unknown command');
 			break;

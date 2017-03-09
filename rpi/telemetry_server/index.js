@@ -24,6 +24,26 @@ function broadcast(argument) {
 			client.send(JSON.stringify(argument));
 	});
 }
+
+wss.on('connection', ws => {
+	ws.on('message', message => {
+		switch(message.command) {
+			case 'ROLL_KP':
+			case 'ROLL_KI':
+			case 'ROLL_KD':
+			case 'PITCH_KP':
+			case 'PITCH_KI':
+			case 'PITCH_KD':
+			case 'YAW_KP':
+			case 'YAW_KI':
+			case 'YAW_KD':
+				UART.send_message(message.command, message.data);
+				break;
+			default:
+				console.log('Unknown command from client', message);
+		}
+	});
+});
 //////////////// END WEB SERVER AND WEBSOCKETS ////////////////
 
 //////////////// BEGIN PS4 CONTROLLER AND SERIAL ////////////////
@@ -42,10 +62,10 @@ UART.on_message(command => {
 			// update relevant attitude field
 			attitude[command.command] = command.data;
 			// send new attitude to connected clients
-			broadcast(JSON.stringify(attitude));
+			broadcast(attitude);
 			break;
 		default:
-			console.log('Unhandled command', command);
+			console.log('Unhandled command from flight control', command);
 	}
 });
 
@@ -53,19 +73,26 @@ const controller = new joystick(0,3500,350);
 // analogue inputs: triggers, gyro, sticks
 controller.on('axis', data => {
 	if (data.number == 2) { // Right Stick horizontal
-		// convert number to radians between -0.17,+0.17
-		let angle = (data.value/32768)*0.17;
+		// convert number to degrees between -10,+10
+		const angle = (data.value/32768)*10;
 		attitude.roll = angle;
 		UART.send_message('ROLL', angle);
 		broadcast(attitude); // temp
 	} else if (data.number == 5) { // Right Stick vertical
-		// convert number to radians between -0.17,+0.17
-		let angle = (data.value/32768)*0.17;
+		// convert number to degrees between -10,+10
+		const angle = (data.value/32768)*10;
 		attitude.pitch = angle;
 		UART.send_message('PITCH', angle);
 		broadcast(attitude); // temp
-	} 
-	// TODO: work out which way round axis 0 and 1 are (yaw vs throttle)
+	} else if (data.number == 0) { // Left Stick horizontal
+		// convert number to angular velocity in degrees/s between -45,45
+		const rate = (data.value/32768)*45;
+		UART.send_message('YAW', rate);
+	} else if (data.number == 1) { // Left Stick vertical
+		// convert number to throttle between 0.95,1.0
+		const throttle = (data.value/655360)+1;
+		UART.send_message('THROTTLE', throttle); 
+	}
 });
 // TODO: digital inputs (buttons)
 
