@@ -1,7 +1,6 @@
 #ifndef _CD_H
 #define _CD_H
 
-
 #include "constants.h"
 #include <stdint.h>
 

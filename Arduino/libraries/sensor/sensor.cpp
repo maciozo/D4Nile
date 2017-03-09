@@ -21,14 +21,14 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 int16_t gx, gy, gz;
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
-double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
-double roll_angle, pitch_angle, yall_angular_vel;
-double err_roll, err_pitch, err_yall;
+float roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
+float roll_angle, pitch_angle, yall_angular_vel;
+float err_roll, err_pitch, err_yall;
 int left_front, right_front, left_back, right_back;
 
-double roll_kp=5, roll_ki=0, roll_kd=0;
-double pitch_kp=5, pitch_ki=0, pitch_kd=0;
-double yall_kp=2, yall_ki=0, yall_kd=0;
+float roll_kp=5, roll_ki=0, roll_kd=0;
+float pitch_kp=5, pitch_ki=0, pitch_kd=0;
+float yall_kp=2, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -104,17 +104,12 @@ void dmpDataReady()
     mpuInterrupt = true;
 }
 
-void do_everything(commanddata_t* setpoints)
+void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
 {
-    roll_setpoint = setpoints->roll_left;
-    pitch_setpoint = setpoints->pitch_forward;
-    yall_setpoint = setpoints->yaw_ccw;
-    altitude_coeff = setpoints->throttle_up;
-
-    // roll_setpoint = 0;
-    // pitch_setpoint = 0;
-    // yall_setpoint = 0;
-    // altitude_coeff = 1;
+    roll_setpoint = target_values->roll_left;
+    pitch_setpoint = target_values->pitch_forward;
+    yall_setpoint = target_values->yaw_ccw;
+    altitude_coeff = target_values->throttle_up;
 
     roll_angle = ypr[2] * 180/M_PI; 
     pitch_angle = ypr[1] * 180/M_PI;
@@ -171,10 +166,10 @@ void do_everything(commanddata_t* setpoints)
 
         unsigned long time = millis();
     }
-
-    data[0]=gz/728;
-    data[1]=ypr[1]* 180/M_PI;
-    data[2]=ypr[2]* 180/M_PI;
+    
+    sensor_data->yaw_ccw = gz/728;
+    sensor_data->pitch_forward = ypr[1]* 180/M_PI;
+    sensor_data->roll_left = ypr[2]* 180/M_PI;
 }
 
 
