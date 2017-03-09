@@ -59,7 +59,7 @@ void uartSendRaw(unsigned char* string, unsigned int length)
     return;
 }
 
-void uartSendCommand(uint8_t command, double data)
+void uartSendCommand(unsigned char command, double data)
 {
     unsigned char toSend[MC_SENDBUFFER_SIZE];
     unsigned char *floatToChar = reinterpret_cast<unsigned char*>(&data);
