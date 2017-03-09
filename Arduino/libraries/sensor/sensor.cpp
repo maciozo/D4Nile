@@ -17,18 +17,18 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
-float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+double ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 int16_t gx, gy, gz;
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
-float roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
-float roll_angle, pitch_angle, yall_angular_vel;
-float err_roll, err_pitch, err_yall;
+double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
+double roll_angle, pitch_angle, yall_angular_vel;
+double err_roll, err_pitch, err_yall;
 int left_front, right_front, left_back, right_back;
 
-float roll_kp=5, roll_ki=0, roll_kd=0;
-float pitch_kp=5, pitch_ki=0, pitch_kd=0;
-float yall_kp=2, yall_ki=0, yall_kd=0;
+double roll_kp=5, roll_ki=0, roll_kd=0;
+double pitch_kp=5, pitch_ki=0, pitch_kd=0;
+double yall_kp=2, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);

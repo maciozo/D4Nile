@@ -4,7 +4,7 @@
 int formatData(commanddata_t* commandData, char* rawdata)
 {
     int32_t notYetFloat = (rawdata[1] << 24) | (rawdata[2] << 16) | (rawdata[3] << 8) | (rawdata[4]);
-    float tempData = *(float*)&notYetFloat;
+    double tempData = *(double*)&notYetFloat;
     switch (rawdata[0])
     {
         case YAW_CCW:

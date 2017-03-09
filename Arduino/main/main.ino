@@ -6,9 +6,15 @@
 
 void setup(void)
 {
-    target_values = {0};
-    sensor_data = {0};
-    old_sensor_data = {0};
+    #ifndef GAIN_TUNING
+        target_values = {0, 0, 0, 0, 0, 0, 0};
+        sensor_data = {0, 0, 0, 0, 0, 0, 0};
+        old_sensor_data = {0, 0, 0, 0, 0, 0, 0};
+    #else
+        target_values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        old_sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    #endif
     
     uartInit();
     uartSendCommand(STATUS, INITIALISING);
