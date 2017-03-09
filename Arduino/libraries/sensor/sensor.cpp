@@ -124,14 +124,15 @@ void dmpDataReady()
 }
 
 
-void do_everything()
+void do_everything(commanddata_t* setpoints)
 {
 
 Serial.println("do evetything loop");
-roll_setpoint = 0;
-pitch_setpoint = 0;
-yall_setpoint = 0;
-altitude_coeff = 1;
+
+roll_setpoint = setpoints->roll_left;
+pitch_setpoint = setpoints->pitch_forward;
+yall_setpoint = setpoints->yaw_ccw;
+altitude_coeff = setpoints->throttle_up;
 
 roll_angle = ypr[2] * 180/M_PI;    
 pitch_angle = ypr[1] * 180/M_PI;  
