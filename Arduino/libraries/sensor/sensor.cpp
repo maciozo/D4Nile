@@ -42,14 +42,7 @@ void init_sensor()
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
-<<<<<<< HEAD
     #endif
-=======
-  #endif
-
-    Serial.begin(115200);
-    while (!Serial)
->>>>>>> refs/remotes/origin/sensors
 
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
@@ -118,10 +111,14 @@ void do_everything(commanddata_t* setpoints)
     yall_setpoint = setpoints->yaw_ccw;
     altitude_coeff = setpoints->throttle_up;
 
-<<<<<<< HEAD
-    roll_angle = ypr[2] * 180/M_PI;    
-    pitch_angle = ypr[1] * 180/M_PI;  
-    yall_angle = ypr[0] * 180/M_PI;
+    // roll_setpoint = 0;
+    // pitch_setpoint = 0;
+    // yall_setpoint = 0;
+    // altitude_coeff = 1;
+
+    roll_angle = ypr[2] * 180/M_PI; 
+    pitch_angle = ypr[1] * 180/M_PI;
+    yall_angular_vel = gz/728;
 
     roll_PID.Compute();
     pitch_PID.Compute();
@@ -132,60 +129,19 @@ void do_everything(commanddata_t* setpoints)
     left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
     right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
 
-    int yaw = (ypr[0] * 180/M_PI);
-=======
-//Serial.println("do evetything loop");
-roll_setpoint = 0;
-pitch_setpoint = 0;
-yall_setpoint = 0;
-altitude_coeff = 1;
-
-roll_angle = ypr[2] * 180/M_PI;    
-pitch_angle = ypr[1] * 180/M_PI;  
-yall_angular_vel = gz/728;
-
-
-roll_PID.Compute();
-pitch_PID.Compute();
-yall_PID.Compute();
-
-left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
-
-//Serial.println(left_front);
-
-//int yaw= (ypr[0] * 180/M_PI);
-
        
-// set motor limits
-      if (right_back > maxPWM) right_back = maxPWM;
-        else if (right_back < minPWM) right_back = minPWM;                  
-      if (right_front > maxPWM) right_front = maxPWM;
-        else if (right_front < minPWM) right_front = minPWM;      
-      if (left_back > maxPWM) left_back = maxPWM;
-        else if (left_back < minPWM) left_back = minPWM;            
-      if (left_front > maxPWM) left_front = maxPWM;
-      else if (left_front < minPWM) left_front = minPWM;
-
-change_pwm(left_front, left_back, right_front, right_back);
-
-    
->>>>>>> refs/remotes/origin/sensors
-
     // set motor limits
-    if      (right_back > maxPWM) right_back = maxPWM;
-    else if (right_back < minPWM) right_back = minPWM;           
-    
-    if      (right_front > maxPWM) right_front = maxPWM;
-    else if (right_front < minPWM) right_front = minPWM;   
-    
-    if      (left_back > maxPWM) left_back = maxPWM;
-    else if (left_back < minPWM) left_back = minPWM;       
-    
-    if      (left_front > maxPWM) left_front = maxPWM;
-    else if (left_front < minPWM) left_front = minPWM;
+    if (right_back > maxPWM) right_back = maxPWM;
+        else if (right_back < minPWM) right_back = minPWM;      
+        
+    if (right_front > maxPWM) right_front = maxPWM;
+        else if (right_front < minPWM) right_front = minPWM;    
+        
+    if (left_back > maxPWM) left_back = maxPWM;
+        else if (left_back < minPWM) left_back = minPWM;        
+        
+    if (left_front > maxPWM) left_front = maxPWM;
+        else if (left_front < minPWM) left_front = minPWM;
 
     change_pwm(left_front, left_back, right_front, right_back);
 
@@ -207,59 +163,18 @@ change_pwm(left_front, left_back, right_front, right_back);
         mpu.getFIFOBytes(fifoBuffer, packetSize); // read a packet from FIFO
         fifoCount -= packetSize;  // track FIFO count here in case there is > 1 packet available
 
-<<<<<<< HEAD
         mpu.dmpGetQuaternion(&q, fifoBuffer);
         mpu.dmpGetGravity(&gravity, &q);
         mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-
-        Serial.print("ypr\t");
-        Serial.print(ypr[0] * 180/M_PI);
-        Serial.print("\t");
-        Serial.print(ypr[1] * 180/M_PI);
-        Serial.print("\t");
-        Serial.println(ypr[2] * 180/M_PI);
-=======
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            mpu.getRotation(&gx, &gy, &gz);
-/*
-            Serial.println("ypr\t");
-            Serial.print(ypr[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[2] * 180/M_PI);
-            Serial.print("\t");   */
-            Serial.println(gz/728);
-
-
-            mpuIntStatus = mpu.getIntStatus();
-            //Serial.print(mpuIntStatus);
-           // Serial.print("\n");     
-
-
-           
-            //unsigned long time = millis();
-            //Serial.println(time);
->>>>>>> refs/remotes/origin/sensors
-
+        mpu.getRotation(&gx, &gy, &gz);
         mpuIntStatus = mpu.getIntStatus();
+
         unsigned long time = millis();
     }
-
-<<<<<<< HEAD
-    for(int i=0;i<3;i++)
-    {
-        data[i] = ypr[i]* 180/M_PI;
-    }
-=======
 
     data[0]=gz/728;
     data[1]=ypr[1]* 180/M_PI;
     data[2]=ypr[2]* 180/M_PI;
-    
->>>>>>> refs/remotes/origin/sensors
 }
 
 
