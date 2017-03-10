@@ -8,7 +8,7 @@ let attitude = {
 // handle WebScoket
 const socket = new WebSocket("ws://"+location.host);
 socket.onopen = function (event) {
-	socket.send("Hello from client");
+	socket.send(JSON.stringify({command: 'Hello'}));
 }
 const messages_container = document.querySelector('#messages');
 socket.onmessage = event => {
