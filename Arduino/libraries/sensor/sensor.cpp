@@ -4,6 +4,7 @@
 #include "MPU6050.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include <math.h>
 
 MPU6050 mpu;
 
@@ -119,10 +120,10 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-    right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-    left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    left_front = thrust*altitude_coeff/(cos(roll_angle)*cos(pitch_angle) - err_pitch + err_roll - err_yall;
+    right_front = thrust*altitude_coeff/(cos(roll_angle)*cos(pitch_angle) - err_pitch - err_roll + err_yall;
+    left_back = thrust*altitude_coeff/(cos(roll_angle)*cos(pitch_angle) + err_pitch + err_roll + err_yall;
+    right_back = thrust*altitude_coeff/(cos(roll_angle)*cos(pitch_angle) + err_pitch - err_roll - err_yall;
 
        
     // set motor limits
