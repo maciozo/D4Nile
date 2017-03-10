@@ -38,6 +38,8 @@ wss.on('connection', ws => {
 			case 'YAW_KP':
 			case 'YAW_KI':
 			case 'YAW_KD':
+			case 'ROLL':
+			case 'PITCH':
 				UART.send_message(message.command, message.data);
 				break;
 			default:
@@ -46,7 +48,7 @@ wss.on('connection', ws => {
 	});
 });
 //////////////// END WEB SERVER AND WEBSOCKETS ////////////////
-
+/*
 //////////////// BEGIN PS4 CONTROLLER AND SERIAL ////////////////
 const attitude = {
 	roll: 0,
@@ -96,3 +98,4 @@ controller.on('axis', data => {
 // TODO: digital inputs (buttons)
 
 //////////////// END PS4 CONTROLLER AND SERIAL ////////////////
+*/
