@@ -3,9 +3,12 @@
 #include "constants.h"
 #include "sensor.h"
 #include "main.h"
+#include "debug.h"
 
 void setup(void)
 {
+    initDebug();
+    debug(2, 8);
     #ifndef GAIN_TUNING
         target_values = {0, 0, 0, 0, 0, 0, 0};
         sensor_data = {0, 0, 0, 0, 0, 0, 0};
@@ -16,28 +19,38 @@ void setup(void)
         old_sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     #endif
     
+    // debug("UARTINIT", 8);
     uartInit();
     uartSendCommand(STATUS, INITIALISING);
     
-    init_pwm();
+    #ifndef DEBUG
+        init_pwm();
+    #endif
+    // debug("SENSINIT", 8);
     init_sensor();
+    // debug("PID INIT", 8);
     init_pid();
     
     uartSendCommand(STATUS, READY);
+    // debug("READY", 5);
 }
 
 void loop(void)
 {
     /* Get command from UART */
+    // debug("READUART", 8);
     uartReadRaw(recvBuffer, MC_RECVBUFFER_SIZE);
     
     /* Put the new command in to the target_values struct */
+    // debug("FORMDATA", 8);
     formatData(&target_values, recvBuffer);
     
     /* Do PID calculations to get the real sensor values towards the target values */
+    // debug("DOEVERYT", 8);
     do_everything(&sensor_data, &target_values);
     
     /* Send any sensor values that have changed since they were last sent */
+    // debug("SENDUART", 8);
     sendNewSensorData(&sensor_data, &old_sensor_data);
 }
 

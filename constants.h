@@ -1,6 +1,12 @@
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
 
+    /* 
+        Enable output to seven segment array
+        Disables PWM functions
+    */
+    #define DEBUG
+
     /* Include variables for tuning PID gain the the commandData struct */
     #define GAIN_TUNING
 

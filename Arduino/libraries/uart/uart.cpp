@@ -34,6 +34,10 @@ void uartInit(void)
     UCSR0C |= (1 << UCSZ01);
     UCSR0C |= (1 << UCSZ00);
     
+    /* LED for debugging */
+    DDRD |= (1 << DDD7); /* Set D7 to write */
+    PORTD &= ~(1 << PORTD7); /* Turn LED off */
+    
     return;
 }
 
@@ -48,12 +52,6 @@ void uartSendRaw(unsigned char* string, unsigned int length)
         
         /* Put character in to transmission buffer */
         UDR0 = string[i];
-        
-        /* Reached end of string */
-        if (string[i] == '\0')
-        {
-            break;
-        }
     }
     
     return;
@@ -62,7 +60,7 @@ void uartSendRaw(unsigned char* string, unsigned int length)
 void uartSendCommand(unsigned char command, double data)
 {
     unsigned char toSend[MC_SENDBUFFER_SIZE];
-    unsigned char *floatToChar = reinterpret_cast<unsigned char*>(&data);
+    unsigned char *floatToChar = (unsigned char*)(&data);
     
     toSend[0] = (unsigned char)command;
     toSend[1] = floatToChar[0];
