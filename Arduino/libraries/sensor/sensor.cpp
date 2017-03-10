@@ -4,6 +4,7 @@
 #include "MPU6050.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "commandData.h"
 
 MPU6050 mpu;
 
@@ -104,7 +105,7 @@ void dmpDataReady()
     mpuInterrupt = true;
 }
 
-void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
+void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, float *data)
 {
     roll_setpoint = target_values->roll_left;
     pitch_setpoint = target_values->pitch_forward;
@@ -167,12 +168,14 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
         unsigned long time = millis();
     }
     
-    sensor_data->yaw_ccw = gz/728;
-    sensor_data->pitch_forward = ypr[1]* 180/M_PI;
-    sensor_data->roll_left = ypr[2]* 180/M_PI;
+    // sensor_data->yaw_ccw = (double)(gz/728.0);
+    // sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
+    // sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
+    
+    data[0] = gz/728;
+    data[1] = ypr[1]* 180/M_PI;
+    data[2] = ypr[2]* 180/M_PI;
 }
-
-
 
 void init_pwm(void)
 {

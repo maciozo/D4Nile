@@ -16,7 +16,7 @@
 #endif
 
 void initDebug();
-void debug(char TextString[], unsigned int Offset);
+// void debug(char TextString[], unsigned int Offset);
 void debug(long number, unsigned int Offset);
 
 #endif
