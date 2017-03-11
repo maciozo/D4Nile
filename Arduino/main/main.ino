@@ -27,11 +27,11 @@ void setup(void)
     initDebug();
     // debug("SETUP", 8);
     #ifndef GAIN_TUNING
-        target_values = {0, 0, 0, 0, 0, 0, 0};
+        target_values = {0, 1.0, 0, 0, 0, 0, 0};
         sensor_data = {0, 0, 0, 0, 0, 0, 0};
         old_sensor_data = {0, 0, 0, 0, 0, 0, 0};
     #else
-        target_values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        target_values = {0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         old_sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     #endif
@@ -50,24 +50,19 @@ void setup(void)
     
     // uartSendCommand(STATUS, READY);
     // debug("READY", 8);
-    
-    OCR0A = 2000/33;		//divide input by 33 to put it in duty cycle range
-    OCR0B = 2000/33;
-    OCR2A = 2000/33;
-    OCR2B = 2000/33;
-    
-    // delay(1000);
 }
 
 void loop(void)
 {
     /* Get command from UART */
     // debug("READUART", 8);
-    uartReadRaw(recvBuffer, MC_RECVBUFFER_SIZE);
-    
-    /* Put the new command in to the target_values struct */
-    // debug("FORMDATA", 8);
-    formatData(&target_values, recvBuffer);
+    if (UCSR0A & (1 << RXC0))
+    {
+        uartReadRaw(recvBuffer, MC_RECVBUFFER_SIZE);
+        /* Put the new command in to the target_values struct */
+        // debug("FORMDATA", 8);
+        formatData(&target_values, recvBuffer);
+    }
     
     /* Do PID calculations to get the real sensor values towards the target values */
     // debug("DE  LOOP", 8);
@@ -75,7 +70,7 @@ void loop(void)
     
     /* Send any sensor values that have changed since they were last sent */
     // debug("SENDUART", 8);
-    sendNewSensorData(&target_values, &old_sensor_data);
+    // sendNewSensorData(&target_values, &old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */

@@ -98,7 +98,7 @@ void uartReadRaw(char* string, unsigned int length)
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
-        while (!(UCSR0A & (1 << RXC0)));
+        // while (!(UCSR0A & (1 << RXC0)));
         
         /* Store character from transmission buffer */
         string[i] = UDR0;

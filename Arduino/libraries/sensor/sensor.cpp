@@ -27,9 +27,9 @@ double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
 double left_front, right_front, left_back, right_back;
 
-double roll_kp=5, roll_ki=0, roll_kd=0;
-double pitch_kp=5, pitch_ki=0, pitch_kd=0;
-double yall_kp=2, yall_ki=0, yall_kd=0;
+double roll_kp=10, roll_ki=0, roll_kd=0;
+double pitch_kp=10, pitch_ki=0, pitch_kd=0;
+double yall_kp=10, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -114,21 +114,21 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
 
     roll_angle = ypr[2] * 180/M_PI; 
     pitch_angle = ypr[1] * 180/M_PI;
-    yall_angular_vel = gz/728;
+    yall_angular_vel = ypr[0] * 180/M_PI;
 
     roll_PID.Compute();
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    // left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-    // right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-    // left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    // right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
+    left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
+    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
     
-    left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
-    right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
-    left_back = thrust*altitude_coeff + pitch_setpoint*10 + roll_setpoint*10 + yall_setpoint;
-    right_back = thrust*altitude_coeff + pitch_setpoint*10 - roll_setpoint*10 - yall_setpoint;
+    // left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
+    // right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
+    // left_back = thrust*altitude_coeff + pitch_setpoint*10 + roll_setpoint*10 + yall_setpoint;
+    // right_back = thrust*altitude_coeff + pitch_setpoint*10 - roll_setpoint*10 - yall_setpoint;
 
        
     // set motor limits
@@ -177,7 +177,7 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
     // sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
     // sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
     
-    data[0] = gz/728;
+    data[0] = ypr[0]* 180/M_PI;
     data[1] = ypr[1]* 180/M_PI;
     data[2] = ypr[2]* 180/M_PI;
 }
@@ -203,6 +203,11 @@ void init_pwm(void)
     OCR0B = 62;
     OCR2A = 62;
     OCR2B = 62;
+    delay(2000);
+    OCR0A = 68;
+    OCR0B = 68;
+    OCR2A = 68;
+    OCR2B = 68;
 }
 
 void change_pwm(double left_front, double left_back, double right_front, double right_back)
