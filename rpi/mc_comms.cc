@@ -55,7 +55,7 @@ int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
     toSend[2] = (char)(data & 0x00FF);
     toSend[3] = (char)'\n';
     
-    uartSendRaw(toSend, uartDevice, 5);
+    uartSendRaw(uartDevice, toSend, 5);
     
     return 0;
 }
