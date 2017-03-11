@@ -20,6 +20,8 @@ FILE* uartInit(const char* device)
     int flags = fcntl(fd, F_GETFL, 0);
     flags |= O_NONBLOCK;
     fcntl(fd, F_SETFL, flags);
+
+    fflush(serial);
     
     /* fclose(serial); */
     
@@ -34,16 +36,13 @@ void uartClose(FILE* uartDevice)
 int uartSendRaw(FILE* uartDevice, char* string, size_t length)
 {
     fwrite(string, sizeof(char), length, uartDevice);
+    fflush(uartDevice);
     return 0;
 }
 
 int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
 {
-    char toSend[5];
-    if ((command < 0x20) | (command > RECV_MAX))
-    {
-        return 1;
-    }
+    char toSend[SENDBUFFER_SIZE];
     
     /*
         Convert 8 bit command and 16 bit data in to a 24 bit string.
@@ -53,9 +52,9 @@ int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
     toSend[0] = (char)command;
     toSend[1] = (char)(data >> 8);
     toSend[2] = (char)(data & 0x00FF);
-    toSend[3] = (char)'\n';
+    // toSend[3] = (char)'\n';
     
-    uartSendRaw(uartDevice, toSend, 5);
+    uartSendRaw(uartDevice, toSend, SENDBUFFER_SIZE);
     
     return 0;
 }

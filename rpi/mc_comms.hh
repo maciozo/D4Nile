@@ -5,7 +5,7 @@
 
 #define SERIAL_DEVICE "/dev/serial0"
 #define RECVBUFFER_SIZE 5
-#define SENDBUFFER_SIZE 5
+#define SENDBUFFER_SIZE 3
 
 FILE* uartInit(const char* device);
 void uartClose(FILE* uartDevice);
