@@ -37,6 +37,8 @@
     #define YAW_KP 0x2E
     #define YAW_KI 0x2F
     #define YAW_KD 0x30
+    
+    #define STAHP 0xFF
 
 /* ========================================================================== */
 

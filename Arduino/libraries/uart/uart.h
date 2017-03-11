@@ -1,10 +1,11 @@
 #ifndef UART_H
 #define UART_H
 
-#define MC_RECVBUFFER_SIZE 6
-#define MC_SENDBUFFER_SIZE 6
+#define MC_RECVBUFFER_SIZE 3
+#define MC_SENDBUFFER_SIZE 3
 
 #define BAUDRATE 115200
+// #define ECHO
 
 /*
 If we have issues with the baud rate try defining DOUBLE_UART_RATE
@@ -36,7 +37,7 @@ void uartSendRaw(char* string, unsigned int length);
     uint8_t command: What the data is describing. Refer to constants.h
     int16_t data: The payload to send
 */
-void uartSendCommand(unsigned char command, double data);
+void uartSendCommand(unsigned char command, int16_t data);
 
 /* Read a string from UART
     char* string: Pointer to the received string to be placed in

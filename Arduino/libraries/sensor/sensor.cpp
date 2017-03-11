@@ -25,7 +25,7 @@ volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin h
 double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
 double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
-int left_front, right_front, left_back, right_back;
+double left_front, right_front, left_back, right_back;
 
 double roll_kp=5, roll_ki=0, roll_kd=0;
 double pitch_kp=5, pitch_ki=0, pitch_kd=0;
@@ -120,10 +120,15 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-    right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-    left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    // left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    // right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
+    // left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
+    // right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    
+    left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
+    right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
+    left_back = thrust*altitude_coeff + pitch_setpoint*10 + roll_setpoint*10 + yall_setpoint;
+    right_back = thrust*altitude_coeff + pitch_setpoint*10 - roll_setpoint*10 - yall_setpoint;
 
        
     // set motor limits
@@ -189,7 +194,7 @@ void init_pwm(void)
     TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
     TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
 
-    //select clock to give prescaler 256, giving a frequency of --Hz
+    //select clock to give prescaler 256, giving a frequency of 244Hz
     TCCR0B = _BV(CS02);
     TCCR2B = _BV(CS22) | _BV(CS21);
 
@@ -200,11 +205,11 @@ void init_pwm(void)
     OCR2B = 62;
 }
 
-void change_pwm(int left_front, int left_back, int right_front, int right_back)
+void change_pwm(double left_front, double left_back, double right_front, double right_back)
 {
-    OCR0A = left_front/33;		//divide input by 33 to put it in duty cycle range
-    OCR0B = left_back/33;
-    OCR2A = right_front/33;
-    OCR2B = right_back/33;
+    OCR0A = left_front/33.3;		//divide input by 33 to put it in duty cycle range
+    OCR0B = left_back/33.3;
+    OCR2A = right_front/33.3;
+    OCR2B = right_back/33.3;
 }
 

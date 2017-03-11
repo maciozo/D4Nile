@@ -36,20 +36,27 @@ void setup(void)
         old_sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     #endif
     
-    debug("UARTINIT", 8);
+    // debug("UARTINIT", 8);
     uartInit();
-    uartSendCommand(STATUS, INITIALISING);
+    // uartSendCommand(STATUS, INITIALISING);
     
     #ifndef DEBUG
         init_pwm();
     #endif
-    debug("SENSINIT", 8);
+    // debug("SENSINIT", 8);
     init_sensor();
-    debug("PID INIT", 8);
+    // debug("PID INIT", 8);
     init_pid();
     
-    uartSendCommand(STATUS, READY);
-    debug("READY", 8);
+    // uartSendCommand(STATUS, READY);
+    // debug("READY", 8);
+    
+    OCR0A = 2000/33;		//divide input by 33 to put it in duty cycle range
+    OCR0B = 2000/33;
+    OCR2A = 2000/33;
+    OCR2B = 2000/33;
+    
+    // delay(1000);
 }
 
 void loop(void)
@@ -68,7 +75,7 @@ void loop(void)
     
     /* Send any sensor values that have changed since they were last sent */
     // debug("SENDUART", 8);
-    // sendNewSensorData(&sensor_data, &old_sensor_data);
+    sendNewSensorData(&target_values, &old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
@@ -76,44 +83,44 @@ void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_dat
 {
     // if (sensor_data->yaw_ccw != old_sensor_data->yaw_ccw)
     // {
-        uartSendCommand(YAW_CCW, sensor_data->yaw_ccw);
-        old_sensor_data->yaw_ccw = sensor_data->yaw_ccw;
+        uartSendCommand(YAW_CCW, (int16_t)((sensor_data->yaw_ccw) * 32767 / 90));
+        // old_sensor_data->yaw_ccw = sensor_data->yaw_ccw;
     // }
     
     // if (sensor_data->throttle_up != old_sensor_data->throttle_up)
     // {
-        uartSendCommand(THROTTLE_UP, sensor_data->throttle_up);
-        old_sensor_data->throttle_up = sensor_data->throttle_up;
+        uartSendCommand(THROTTLE_UP, (int16_t)((sensor_data->throttle_up - 1) * 327670));
+        // old_sensor_data->throttle_up = sensor_data->throttle_up;
     // }
     
     // if (sensor_data->roll_left != old_sensor_data->roll_left)
     // {
-        uartSendCommand(ROLL_LEFT, sensor_data->roll_left);
-        old_sensor_data->roll_left = sensor_data->roll_left;
+        uartSendCommand(ROLL_LEFT, (int16_t)((sensor_data->roll_left) * 32767 / 10));
+        // old_sensor_data->roll_left = sensor_data->roll_left;
     // }
     
     // if (sensor_data->pitch_forward != old_sensor_data->pitch_forward)
     // {
-        uartSendCommand(PITCH_FORWARD, sensor_data->pitch_forward);
-        old_sensor_data->pitch_forward = sensor_data->pitch_forward;
+        uartSendCommand(PITCH_FORWARD, (int16_t)((sensor_data->pitch_forward) * 32767 / 10));
+        // old_sensor_data->pitch_forward = sensor_data->pitch_forward;
     // }
     
     // if (sensor_data->mode_button != old_sensor_data->mode_button)
     // {
-        uartSendCommand(MODE_BUTTON, sensor_data->mode_button);
-        old_sensor_data->mode_button = sensor_data->mode_button;
+        // uartSendCommand(MODE_BUTTON, sensor_data->mode_button);
+        // old_sensor_data->mode_button = sensor_data->mode_button;
     // }
     
     // if (sensor_data->servo_button != old_sensor_data->servo_button)
     // {
-        uartSendCommand(SERVO_BUTTON, sensor_data->servo_button);
-        old_sensor_data->servo_button = sensor_data->servo_button;
+        // uartSendCommand(SERVO_BUTTON, sensor_data->servo_button);
+        // old_sensor_data->servo_button = sensor_data->servo_button;
     // }
     
     // if (sensor_data->autoland != old_sensor_data->autoland)
     // {
-        uartSendCommand(AUTOLAND, sensor_data->autoland);
-        old_sensor_data->autoland = sensor_data->autoland;
+        // uartSendCommand(AUTOLAND, sensor_data->autoland);
+        // old_sensor_data->autoland = sensor_data->autoland;
     // }
     
 
