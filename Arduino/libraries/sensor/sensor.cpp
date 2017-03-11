@@ -207,9 +207,9 @@ void init_pwm(void)
 
 void change_pwm(double left_front, double left_back, double right_front, double right_back)
 {
-    OCR0A = left_front/33.3;		//divide input by 33 to put it in duty cycle range
-    OCR0B = left_back/33.3;
-    OCR2A = right_front/33.3;
-    OCR2B = right_back/33.3;
+    OCR0A = right_front/33.3; //divide input by 33 to put it in duty cycle range
+    OCR0B = left_front/33.3;
+    OCR2A = right_back/33.3;
+    OCR2B = left_back/33.3;
 }
 
