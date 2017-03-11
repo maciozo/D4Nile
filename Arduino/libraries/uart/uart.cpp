@@ -1,5 +1,5 @@
 #include "uart.h"
-#include "../../../constants.h"
+#include "constants.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -34,6 +34,26 @@ void uartInit(void)
     UCSR0C |= (1 << UCSZ01);
     UCSR0C |= (1 << UCSZ00);
     
+    /* LED for debugging */
+    DDRD |= (1 << DDD7); /* Set D7 to write */
+    PORTD &= ~(1 << PORTD7); /* Turn LED off */
+    
+    return;
+}
+
+void uartSendRaw(unsigned char* string, unsigned int length)
+{
+    unsigned int i;
+    
+    for (i = 0; i < length; i++)
+    {
+        /* Wait until the transmit buffer is populated. UDREn goes high when data register is empty. */
+        while (!(UCSR0A & (1 << UDRE0)));
+        
+        /* Put character in to transmission buffer */
+        UDR0 = string[i];
+    }
+    
     return;
 }
 
@@ -48,27 +68,24 @@ void uartSendRaw(char* string, unsigned int length)
         
         /* Put character in to transmission buffer */
         UDR0 = string[i];
-        
-        /* Reached end of string */
-        if (string[i] == '\0')
-        {
-            break;
-        }
     }
     
     return;
 }
 
-void uartSendCommand(uint8_t command, float data)
+void uartSendCommand(unsigned char command, int16_t data)
 {
-    char toSend[MC_SENDBUFFER_SIZE];
+    unsigned char toSend[MC_SENDBUFFER_SIZE];
+    // unsigned char *floatToChar = (unsigned char*)(&data);
     
-    toSend[0] = (char)command;
-    toSend[1] = (char)((data >> 24));
-    toSend[2] = (char)((data >> 16) & 0x000F);
-    toSend[3] = (char)((data >>  8) & 0x000F);
-    toSend[4] = (char)((data >>  0) & 0x000F);
-    toSend[5] = '\n';
+    toSend[0] = (unsigned char)command;
+    // toSend[1] = floatToChar[0];
+    // toSend[2] = floatToChar[1];
+    // toSend[3] = floatToChar[2];
+    // toSend[4] = floatToChar[3];
+    toSend[1] = (char) (data >> 8);
+    toSend[2] = (char) (data & 0x0F);
+    // toSend[5] = (unsigned char)'\n';
     
     uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
     
@@ -81,9 +98,12 @@ void uartReadRaw(char* string, unsigned int length)
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
-        while (!(UCSR0A & (1 << RXC0)));
+        // while (!(UCSR0A & (1 << RXC0)));
         
         /* Store character from transmission buffer */
         string[i] = UDR0;
     }
+    #ifdef ECHO
+    uartSendRaw(string, MC_RECVBUFFER_SIZE);
+    #endif
 }

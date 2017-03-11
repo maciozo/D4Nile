@@ -8,7 +8,7 @@ let attitude = {
 // handle WebScoket
 const socket = new WebSocket("ws://"+location.host);
 socket.onopen = function (event) {
-	socket.send("Hello from client");
+	socket_send({command: 'hello'});
 }
 const messages_container = document.querySelector('#messages');
 socket.onmessage = event => {
@@ -16,6 +16,43 @@ socket.onmessage = event => {
 	attitude = JSON.parse(event.data);
 	console.log(attitude);
 	messages_container.innerHTML += `${event.data}\n`;
+}
+function socket_send(object) {
+	socket.send(JSON.stringify(object));
+}
+
+document.onkeydown = function(event) {
+	switch (event.keyCode) {
+		case 37: // left
+			socket_send({command: 'ROLL', data: -10.0});
+			break;
+		case 38: // up
+			socket_send({command: 'PITCH', data: 10.0});
+			break;
+		case 39: // right
+			socket_send({command: 'ROLL', data: 10.0});
+			break;
+		case 40: // down
+			socket_send({command: 'PITCH', data: -10.0});
+			break;
+	}
+}
+
+document.onkeyup = function(event) {
+	switch (event.keyCode) {
+		case 37: // left
+			socket_send({command: 'ROLL', data: 0});
+			break;
+		case 38: // up
+			socket_send({command: 'PITCH', data: 0});
+			break;
+		case 39: // right
+			socket_send({command: 'ROLL', data: 0});
+			break;
+		case 40: // down
+			socket_send({command: 'PITCH', data: 0});
+			break;
+	}
 }
 
 let quad; // to hold quad object in order to rotate

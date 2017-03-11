@@ -1,10 +1,11 @@
 #ifndef UART_H
 #define UART_H
 
-#define MC_RECVBUFFER_SIZE 6
-#define MC_SENDBUFFER_SIZE 4
+#define MC_RECVBUFFER_SIZE 3
+#define MC_SENDBUFFER_SIZE 3
 
 #define BAUDRATE 115200
+// #define ECHO
 
 /*
 If we have issues with the baud rate try defining DOUBLE_UART_RATE
@@ -29,13 +30,14 @@ void uartInit(void);
     char* string: string to be sent
     unsigned int length: length of the string, including '\0'. Will stop sending on '\0'.
 */
+void uartSendRaw(unsigned char* string, unsigned int length);
 void uartSendRaw(char* string, unsigned int length);
 
 /* Send telemetry data over UART.
     uint8_t command: What the data is describing. Refer to constants.h
     int16_t data: The payload to send
 */
-void uartSendCommand(uint8_t command, float data);
+void uartSendCommand(unsigned char command, int16_t data);
 
 /* Read a string from UART
     char* string: Pointer to the received string to be placed in

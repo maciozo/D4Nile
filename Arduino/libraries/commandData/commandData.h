@@ -1,17 +1,29 @@
 #ifndef _CD_H
 #define _CD_H
 
+#include "constants.h"
 #include <stdint.h>
 
 typedef struct
 {
-  float yaw_ccw;
-  float throttle_up;
-  float roll_left;
-  float pitch_forward;
-  float mode_button;
-  float servo_button;
-  float autoland;
+    double yaw_ccw;
+    double throttle_up;
+    double roll_left;
+    double pitch_forward;
+    int8_t mode_button;
+    int8_t servo_button;
+    int8_t autoland;
+    #ifdef GAIN_TUNING
+        double roll_kp;
+        double roll_ki;
+        double roll_kd;
+        double pitch_kp;
+        double pitch_ki;
+        double pitch_kd;
+        double yaw_kp;
+        double yaw_ki;
+        double yaw_kd;
+    #endif
 } commanddata_t;
 
 int formatData(commanddata_t* commandData, char* rawdata);

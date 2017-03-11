@@ -27,6 +27,7 @@ function broadcast(argument) {
 
 wss.on('connection', ws => {
 	ws.on('message', message => {
+		message = JSON.parse(message);
 		switch(message.command) {
 			case 'ROLL_KP':
 			case 'ROLL_KI':
@@ -37,6 +38,8 @@ wss.on('connection', ws => {
 			case 'YAW_KP':
 			case 'YAW_KI':
 			case 'YAW_KD':
+			case 'ROLL':
+			case 'PITCH':
 				UART.send_message(message.command, message.data);
 				break;
 			default:
@@ -45,7 +48,7 @@ wss.on('connection', ws => {
 	});
 });
 //////////////// END WEB SERVER AND WEBSOCKETS ////////////////
-
+/*
 //////////////// BEGIN PS4 CONTROLLER AND SERIAL ////////////////
 const attitude = {
 	roll: 0,
@@ -60,7 +63,7 @@ UART.on_message(command => {
 		case 'PITCH':
 		case 'YAW':
 			// update relevant attitude field
-			attitude[command.command] = command.data;
+			attitude[command.command.toLowerCase()] = command.data;
 			// send new attitude to connected clients
 			broadcast(attitude);
 			break;
@@ -77,13 +80,11 @@ controller.on('axis', data => {
 		const angle = (data.value/32768)*10;
 		attitude.roll = angle;
 		UART.send_message('ROLL', angle);
-		broadcast(attitude); // temp
 	} else if (data.number == 5) { // Right Stick vertical
 		// convert number to degrees between -10,+10
 		const angle = (data.value/32768)*10;
 		attitude.pitch = angle;
 		UART.send_message('PITCH', angle);
-		broadcast(attitude); // temp
 	} else if (data.number == 0) { // Left Stick horizontal
 		// convert number to angular velocity in degrees/s between -45,45
 		const rate = (data.value/32768)*45;
@@ -97,3 +98,4 @@ controller.on('axis', data => {
 // TODO: digital inputs (buttons)
 
 //////////////// END PS4 CONTROLLER AND SERIAL ////////////////
+*/

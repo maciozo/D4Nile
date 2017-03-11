@@ -4,6 +4,7 @@
 #include "MPU6050.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "commandData.h"
 
 MPU6050 mpu;
 
@@ -19,16 +20,17 @@ Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 int16_t gx, gy, gz;
+int16_t gyro[3];
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
 double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
 double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
-int left_front, right_front, left_back, right_back;
+double left_front, right_front, left_back, right_back;
 
-double roll_kp=5, roll_ki=0, roll_kd=0;
-double pitch_kp=5, pitch_ki=0, pitch_kd=0;
-double yall_kp=2, yall_ki=0, yall_kd=0;
+double roll_kp=10, roll_ki=0, roll_kd=0;
+double pitch_kp=10, pitch_ki=0, pitch_kd=0;
+double yall_kp=10, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -42,14 +44,7 @@ void init_sensor()
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
-<<<<<<< HEAD
     #endif
-=======
-  #endif
-
-    Serial.begin(115200);
-    while (!Serial)
->>>>>>> refs/remotes/origin/sensors
 
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
@@ -111,81 +106,44 @@ void dmpDataReady()
     mpuInterrupt = true;
 }
 
-void do_everything(commanddata_t* setpoints)
+void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, float *data)
 {
-    roll_setpoint = setpoints->roll_left;
-    pitch_setpoint = setpoints->pitch_forward;
-    yall_setpoint = setpoints->yaw_ccw;
-    altitude_coeff = setpoints->throttle_up;
+    roll_setpoint = target_values->roll_left;
+    pitch_setpoint = target_values->pitch_forward;
+    yall_setpoint = target_values->yaw_ccw;
+    altitude_coeff = target_values->throttle_up;
 
-<<<<<<< HEAD
-    roll_angle = ypr[2] * 180/M_PI;    
-    pitch_angle = ypr[1] * 180/M_PI;  
-    yall_angle = ypr[0] * 180/M_PI;
+    roll_angle = ypr[2] * 180/M_PI; 
+    pitch_angle = ypr[1] * 180/M_PI;
+    yall_angular_vel = gyro[2];
 
     roll_PID.Compute();
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    right_back = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
     right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
     left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
-
-    int yaw = (ypr[0] * 180/M_PI);
-=======
-//Serial.println("do evetything loop");
-roll_setpoint = 0;
-pitch_setpoint = 0;
-yall_setpoint = 0;
-altitude_coeff = 1;
-
-roll_angle = ypr[2] * 180/M_PI;    
-pitch_angle = ypr[1] * 180/M_PI;  
-yall_angular_vel = gz/728;
-
-
-roll_PID.Compute();
-pitch_PID.Compute();
-yall_PID.Compute();
-
-left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
-
-//Serial.println(left_front);
-
-//int yaw= (ypr[0] * 180/M_PI);
+    left_front = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    
+    // left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
+    // right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
+    // left_back = thrust*altitude_coeff + pitch_setpoint*10 + roll_setpoint*10 + yall_setpoint;
+    // right_back = thrust*altitude_coeff + pitch_setpoint*10 - roll_setpoint*10 - yall_setpoint;
 
        
-// set motor limits
-      if (right_back > maxPWM) right_back = maxPWM;
-        else if (right_back < minPWM) right_back = minPWM;                  
-      if (right_front > maxPWM) right_front = maxPWM;
-        else if (right_front < minPWM) right_front = minPWM;      
-      if (left_back > maxPWM) left_back = maxPWM;
-        else if (left_back < minPWM) left_back = minPWM;            
-      if (left_front > maxPWM) left_front = maxPWM;
-      else if (left_front < minPWM) left_front = minPWM;
-
-change_pwm(left_front, left_back, right_front, right_back);
-
-    
->>>>>>> refs/remotes/origin/sensors
-
     // set motor limits
-    if      (right_back > maxPWM) right_back = maxPWM;
-    else if (right_back < minPWM) right_back = minPWM;           
-    
-    if      (right_front > maxPWM) right_front = maxPWM;
-    else if (right_front < minPWM) right_front = minPWM;   
-    
-    if      (left_back > maxPWM) left_back = maxPWM;
-    else if (left_back < minPWM) left_back = minPWM;       
-    
-    if      (left_front > maxPWM) left_front = maxPWM;
-    else if (left_front < minPWM) left_front = minPWM;
+    if (right_back > maxPWM) right_back = maxPWM;
+        else if (right_back < minPWM) right_back = minPWM;      
+        
+    if (right_front > maxPWM) right_front = maxPWM;
+        else if (right_front < minPWM) right_front = minPWM;    
+        
+    if (left_back > maxPWM) left_back = maxPWM;
+        else if (left_back < minPWM) left_back = minPWM;        
+        
+    if (left_front > maxPWM) left_front = maxPWM;
+        else if (left_front < minPWM) left_front = minPWM;
 
     change_pwm(left_front, left_back, right_front, right_back);
 
@@ -207,62 +165,24 @@ change_pwm(left_front, left_back, right_front, right_back);
         mpu.getFIFOBytes(fifoBuffer, packetSize); // read a packet from FIFO
         fifoCount -= packetSize;  // track FIFO count here in case there is > 1 packet available
 
-<<<<<<< HEAD
         mpu.dmpGetQuaternion(&q, fifoBuffer);
         mpu.dmpGetGravity(&gravity, &q);
         mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-
-        Serial.print("ypr\t");
-        Serial.print(ypr[0] * 180/M_PI);
-        Serial.print("\t");
-        Serial.print(ypr[1] * 180/M_PI);
-        Serial.print("\t");
-        Serial.println(ypr[2] * 180/M_PI);
-=======
-            mpu.dmpGetQuaternion(&q, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
-            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            mpu.getRotation(&gx, &gy, &gz);
-/*
-            Serial.println("ypr\t");
-            Serial.print(ypr[0] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[1] * 180/M_PI);
-            Serial.print("\t");
-            Serial.print(ypr[2] * 180/M_PI);
-            Serial.print("\t");   */
-            Serial.println(gz/728);
-
-
-            mpuIntStatus = mpu.getIntStatus();
-            //Serial.print(mpuIntStatus);
-           // Serial.print("\n");     
-
-
-           
-            //unsigned long time = millis();
-            //Serial.println(time);
->>>>>>> refs/remotes/origin/sensors
-
+        mpu.getRotation(&gx, &gy, &gz);
+        mpu.dmpGetGyro(gyro,fifoBuffer);
         mpuIntStatus = mpu.getIntStatus();
+
         unsigned long time = millis();
     }
-
-<<<<<<< HEAD
-    for(int i=0;i<3;i++)
-    {
-        data[i] = ypr[i]* 180/M_PI;
-    }
-=======
-
-    data[0]=gz/728;
-    data[1]=ypr[1]* 180/M_PI;
-    data[2]=ypr[2]* 180/M_PI;
     
->>>>>>> refs/remotes/origin/sensors
+    // sensor_data->yaw_ccw = (double)gyro[2]);
+    // sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
+    // sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
+    
+    data[0] = gyro[2];
+    data[1] = ypr[1]* 180/M_PI;
+    data[2] = ypr[2]* 180/M_PI;
 }
-
-
 
 void init_pwm(void)
 {
@@ -276,7 +196,7 @@ void init_pwm(void)
     TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
     TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
 
-    //select clock to give prescaler 256, giving a frequency of --Hz
+    //select clock to give prescaler 256, giving a frequency of 244Hz
     TCCR0B = _BV(CS02);
     TCCR2B = _BV(CS22) | _BV(CS21);
 
@@ -285,13 +205,18 @@ void init_pwm(void)
     OCR0B = 62;
     OCR2A = 62;
     OCR2B = 62;
+    delay(2000);
+    OCR0A = 68;
+    OCR0B = 68;
+    OCR2A = 68;
+    OCR2B = 68;
 }
 
-void change_pwm(int left_front, int left_back, int right_front, int right_back)
+void change_pwm(double left_front, double left_back, double right_front, double right_back)
 {
-    OCR0A = left_front/33;		//divide input by 33 to put it in duty cycle range
-    OCR0B = left_back/33;
-    OCR2A = right_front/33;
-    OCR2B = right_back/33;
+    OCR0A = right_front/33.3; //divide input by 33 to put it in duty cycle range
+    OCR0B = left_front/33.3;
+    OCR2A = right_back/33.3;
+    OCR2B = left_back/33.3;
 }
 
