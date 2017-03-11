@@ -20,6 +20,7 @@ Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 int16_t gx, gy, gz;
+int16_t gyro[3];
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
 double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
@@ -114,16 +115,16 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
 
     roll_angle = ypr[2] * 180/M_PI; 
     pitch_angle = ypr[1] * 180/M_PI;
-    yall_angular_vel = ypr[0] * 180/M_PI;
+    yall_angular_vel = gyro[2];
 
     roll_PID.Compute();
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    right_back = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
     right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
     left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    left_front = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
     
     // left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
     // right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
@@ -168,16 +169,17 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
         mpu.dmpGetGravity(&gravity, &q);
         mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
         mpu.getRotation(&gx, &gy, &gz);
+        mpu.dmpGetGyro(gyro,fifoBuffer);
         mpuIntStatus = mpu.getIntStatus();
 
         unsigned long time = millis();
     }
     
-    // sensor_data->yaw_ccw = (double)(gz/728.0);
+    // sensor_data->yaw_ccw = (double)gyro[2]);
     // sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
     // sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
     
-    data[0] = ypr[0]* 180/M_PI;
+    data[0] = gyro[2];
     data[1] = ypr[1]* 180/M_PI;
     data[2] = ypr[2]* 180/M_PI;
 }
