@@ -35,6 +35,8 @@ int main(int argc, char** argv)
 {
     const char uartDevice[] = "/dev/serial0";
     FILE* serialDevice = uartInit(uartDevice);
+    
+    sleep(10);
 
     // Create an instance of Joystick
     Joystick joystick("/dev/input/js0");
