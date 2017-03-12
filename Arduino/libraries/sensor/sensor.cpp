@@ -197,9 +197,9 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
         unsigned long time = millis();
     }
     
-    // sensor_data->yaw_ccw = (double)gyro[2]);
-    // sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
-    // sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
+    sensor_data->yaw_ccw = (double)gyro[2];
+    sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
+    sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
     
     data[0] = gyro[2];
     data[1] = ypr[1]* 180/M_PI;

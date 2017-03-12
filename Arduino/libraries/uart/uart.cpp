@@ -84,7 +84,7 @@ void uartSendCommand(unsigned char command, int16_t data)
     // toSend[3] = floatToChar[2];
     // toSend[4] = floatToChar[3];
     toSend[1] = (char) (data >> 8);
-    toSend[2] = (char) (data & 0x0F);
+    toSend[2] = (char) (data & 0xFF);
     // toSend[5] = (unsigned char)'\n';
     
     uartSendRaw(toSend, MC_SENDBUFFER_SIZE);

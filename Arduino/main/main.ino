@@ -70,7 +70,7 @@ void loop(void)
     
     /* Send any sensor values that have changed since they were last sent */
     // debug("SENDUART", 8);
-    // sendNewSensorData(&target_values, &old_sensor_data);
+    sendNewSensorData(&sensor_data, &old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
@@ -84,7 +84,7 @@ void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_dat
     
     // if (sensor_data->throttle_up != old_sensor_data->throttle_up)
     // {
-        uartSendCommand(THROTTLE_UP, (int16_t)((sensor_data->throttle_up - 1) * 327670));
+        // uartSendCommand(THROTTLE_UP, (int16_t)((sensor_data->throttle_up - 1) * 327670));
         // old_sensor_data->throttle_up = sensor_data->throttle_up;
     // }
     
@@ -98,24 +98,6 @@ void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_dat
     // {
         uartSendCommand(PITCH_FORWARD, (int16_t)((sensor_data->pitch_forward) * 32767 / 10));
         // old_sensor_data->pitch_forward = sensor_data->pitch_forward;
-    // }
-    
-    // if (sensor_data->mode_button != old_sensor_data->mode_button)
-    // {
-        // uartSendCommand(MODE_BUTTON, sensor_data->mode_button);
-        // old_sensor_data->mode_button = sensor_data->mode_button;
-    // }
-    
-    // if (sensor_data->servo_button != old_sensor_data->servo_button)
-    // {
-        // uartSendCommand(SERVO_BUTTON, sensor_data->servo_button);
-        // old_sensor_data->servo_button = sensor_data->servo_button;
-    // }
-    
-    // if (sensor_data->autoland != old_sensor_data->autoland)
-    // {
-        // uartSendCommand(AUTOLAND, sensor_data->autoland);
-        // old_sensor_data->autoland = sensor_data->autoland;
     // }
     
 
