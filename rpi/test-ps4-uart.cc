@@ -40,14 +40,23 @@ int main(int argc, char** argv)
     Joystick joystick("/dev/input/js0");
 
     // Ensure that it was found and that we can use it
-    if (joystick.isFound())
+
+    
+    while(true)
     {
-        printf("Joystick Connected.\n");
+        if joystick.isFound()
+        {
+            break;
+        }
+        else
+        {
+            usleep(10000);
+        }
     }
+    
     else
     {
-        printf("Joystick not detected, exiting.\n");
-        exit(1);
+       prinf("Joystick connected"); 
     }
 
     while (true)
