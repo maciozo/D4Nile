@@ -1,7 +1,7 @@
 #include "commandData.h"
 #include "constants.h"
-
 #include "uart.h"
+#include <avr/io.h>
 
 int formatData(commanddata_t* commandData, char* rawdata)
 {
@@ -23,10 +23,6 @@ int formatData(commanddata_t* commandData, char* rawdata)
             commandData->yaw_ccw = (tempData / 32767.0) * 90;
             break;
         case THROTTLE_UP:
-            char a[2];
-            // a[0] = rawdata[1];
-            // a[1] = rawdata[2];
-            // uartSendRaw(a, 2);
             commandData->throttle_up = (tempData/327670.0) + 1;
             break;
         case ROLL_LEFT:
@@ -89,7 +85,7 @@ int formatData(commanddata_t* commandData, char* rawdata)
             }
             break;
             
-        case PID_INC
+        case PID_INC:
             commandData->CURRENT_TUNING += (rawdata[2] & 1) * 0.1;
             break;
             
