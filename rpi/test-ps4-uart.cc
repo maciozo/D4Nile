@@ -31,6 +31,8 @@ int16_t pidDec = 0;        // L1
 int16_t pidInc = 0;        // R1
 int16_t STAAAHP = 0;       // Touchpad button
 
+bool start = false;
+
 int main(int argc, char** argv)
 {
     const char uartDevice[] = "/dev/serial0";
@@ -55,6 +57,26 @@ int main(int argc, char** argv)
 
     while (true)
     {
+        JoystickEvent event;
+        while (!start)
+        {
+            if (joystick.sample(&event))
+            {
+                if (event.isButton())
+                {
+                    if (event.number == 0)
+                    {
+                        start = true;
+                        break;
+                    }
+                }
+            }
+            uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
+            uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
+            uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
+            uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
+            uartSendCommand(serialDevice, YAW_CCW, yawCCW);
+        }
         // Restrict rate
         usleep(1000);
         //uartSendCommand(serialDevice, MODE_BUTTON, modeButton);
@@ -65,7 +87,7 @@ int main(int argc, char** argv)
         //uartSendCommand(serialDevice, YAW_CCW, yawCCW);
 
         // Attempt to sample an event from the joystick
-        JoystickEvent event;
+        
         if (joystick.sample(&event))
         {
             if (event.isButton())
