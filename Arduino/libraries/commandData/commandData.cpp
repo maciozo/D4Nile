@@ -8,17 +8,6 @@ int formatData(commanddata_t* commandData, char* rawdata)
     int16_t tempData = (rawdata[1] << 8) | (rawdata[2] & 0xFF);
     switch (rawdata[0])
     {
-        case STAHP:
-            if (tempData)
-            {
-                OCR0A = 62;
-                OCR0B = 62;
-                OCR2A = 62;
-                OCR2B = 62;
-                while(1);
-            }
-            break;
-            
         case YAW_CCW:
             commandData->yaw_ccw = (tempData / 32767.0) * 90;
             break;

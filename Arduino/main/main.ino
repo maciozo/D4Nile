@@ -1,6 +1,6 @@
-#include "constants.h"
 #include "uart.h"
 #include "commandData.h"
+#include "constants.h"
 #include "sensor.h"
 #include "main.h"
 #include <stdio.h>
