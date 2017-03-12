@@ -35,7 +35,6 @@ int main(int argc, char** argv)
 {
     const char uartDevice[] = "/dev/serial0";
     FILE* serialDevice = uartInit(uartDevice);
-    bool connected = false;
 
     // Create an instance of Joystick
     Joystick joystick("/dev/input/js0");
@@ -44,20 +43,11 @@ int main(int argc, char** argv)
     if (joystick.isFound())
     {
         printf("Joystick Connected.\n");
-        connected = true;
     }
     else
     {
-        printf("Waiting for joystick.\n");
-        while (!connected)
-        {
-            Joystick joystick("/dev/input/js0");
-            if (joystick.isFound())
-            {
-                connected = true;
-                printf("Joystick Connected.\n");
-            }
-        }
+        printf("Joystick not detected, exiting.\n");
+        exit(1);
     }
 
     while (true)
