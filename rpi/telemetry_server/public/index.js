@@ -12,10 +12,18 @@ socket.onopen = function (event) {
 }
 const messages_container = document.querySelector('#messages');
 socket.onmessage = event => {
-	console.log('received:', event.data);
-	attitude = JSON.parse(event.data);
-	console.log(attitude);
-	messages_container.innerHTML += `${event.data}\n`;
+	const command = JSON.parse(event.data);
+	console.log('received', command);
+	messages_container.innerHTML += `${command}<br/>`;
+	switch(command.command) {
+		case 'ATTITUDE':
+			attitude = command.data;
+			break;
+		case 'VOLTAGE':
+			break;
+		default:
+			console.log('Unknown command from server');
+	}
 }
 function socket_send(object) {
 	socket.send(JSON.stringify(object));
@@ -24,16 +32,16 @@ function socket_send(object) {
 document.onkeydown = function(event) {
 	switch (event.keyCode) {
 		case 37: // left
-			socket_send({command: 'ROLL', data: -10.0});
+			socket_send({command: 'ROLL', data: -32000});
 			break;
 		case 38: // up
-			socket_send({command: 'PITCH', data: 10.0});
+			socket_send({command: 'PITCH', data: 32000);
 			break;
 		case 39: // right
-			socket_send({command: 'ROLL', data: 10.0});
+			socket_send({command: 'ROLL', data: 32000});
 			break;
 		case 40: // down
-			socket_send({command: 'PITCH', data: -10.0});
+			socket_send({command: 'PITCH', data: -32000});
 			break;
 	}
 }
