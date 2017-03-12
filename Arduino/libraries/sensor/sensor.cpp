@@ -222,10 +222,10 @@ void init_pwm(void)
     OCR2A = 62;
     OCR2B = 62;
     delay(1000);
-    OCR0A = 67;
-    OCR0B = 67;
-    OCR2A = 67;
-    OCR2B = 67;
+    OCR0A = 68;
+    OCR0B = 68;
+    OCR2A = 68;
+    OCR2B = 68;
 }
 
 void change_pwm(double left_front, double left_back, double right_front, double right_back)
