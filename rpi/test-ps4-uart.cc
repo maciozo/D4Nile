@@ -46,6 +46,7 @@ int main(int argc, char** argv)
     {
         if joystick.isFound()
         {
+            printf("Joystick Connected");
             break;
         }
         else
@@ -53,12 +54,7 @@ int main(int argc, char** argv)
             usleep(10000);
         }
     }
-    
-    else
-    {
-       prinf("Joystick connected"); 
-    }
-
+   
     while (true)
     {
         // Restrict rate
