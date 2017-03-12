@@ -40,15 +40,12 @@ int main(int argc, char** argv)
     Joystick joystick("/dev/input/js0");
 
     // Ensure that it was found and that we can use it
-    if (joystick.isFound())
+    printf("Waiting for controller...\n");
+    while (!(joystick.isFound()))
     {
-        printf("Joystick Connected.\n");
+        usleep(1000);
     }
-    else
-    {
-        printf("Joystick not detected, exiting.\n");
-        exit(1);
-    }
+    printf("Connected\n");
 
     while (true)
     {
@@ -60,6 +57,17 @@ int main(int argc, char** argv)
         //uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
         //uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
         //uartSendCommand(serialDevice, YAW_CCW, yawCCW);
+        
+        if (!(joystick.isFound()))
+        {
+            printf("Controller disconnected\n");
+            printf("Waiting for controller...\n");
+            while (!(joystick.isFound()))
+            {
+                usleep(1000);
+            }
+            printf("Connected\n");
+        }
 
         // Attempt to sample an event from the joystick
         JoystickEvent event;
