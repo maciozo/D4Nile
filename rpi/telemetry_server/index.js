@@ -95,7 +95,7 @@ controller.on('axis', data => {
 	} else if (data.number == 1) { // Left Stick vertical
 		// convert number to throttle between 0.95,1.0
 		const throttle = (data.value/655360)+1;
-		UART.send_message('THROTTLE', data.value); 
+		UART.send_message('THROTTLE', -data.value); 
 	}
 });
 controller.on('button', data => {

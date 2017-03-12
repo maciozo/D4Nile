@@ -20,6 +20,7 @@ socket.onmessage = event => {
 			attitude = command.data;
 			break;
 		case 'VOLTAGE':
+			document.querySelector('#voltage').innerHTML = command.data + 'V';
 			break;
 		default:
 			console.log('Unknown command from server');
@@ -35,7 +36,7 @@ document.onkeydown = function(event) {
 			socket_send({command: 'ROLL', data: -32000});
 			break;
 		case 38: // up
-			socket_send({command: 'PITCH', data: 32000);
+			socket_send({command: 'PITCH', data: 32000});
 			break;
 		case 39: // right
 			socket_send({command: 'ROLL', data: 32000});

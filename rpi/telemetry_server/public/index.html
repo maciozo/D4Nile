@@ -9,11 +9,22 @@
 				background-color: black;
 				text-align: center;
 			}
+			#messages {
+				font-size: 0.8rem;
+				font-family: monospace;
+			}
+			#voltage {
+				color: green;
+				font-size: 2rem;
+			}
 		</style>
 	</head>
 	<body>
 		<h1>Welcome to ITCHEN postman status</h1>
 		<div id="rendering_container"></div>
+		<div>
+			<p id="voltage">0V</p>
+		</div>
 		<div id="messages"></div>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
 		<script src="index.js"></script>
