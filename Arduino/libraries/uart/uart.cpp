@@ -57,6 +57,22 @@ void uartSendRaw(unsigned char* string, unsigned int length)
     return;
 }
 
+void uartSendRaw(char* string, unsigned int length)
+{
+    unsigned int i;
+    
+    for (i = 0; i < length; i++)
+    {
+        /* Wait until the transmit buffer is populated. UDREn goes high when data register is empty. */
+        while (!(UCSR0A & (1 << UDRE0)));
+        
+        /* Put character in to transmission buffer */
+        UDR0 = string[i];
+    }
+    
+    return;
+}
+
 void uartSendCommand(unsigned char command, double data)
 {
     unsigned char toSend[MC_SENDBUFFER_SIZE];
@@ -77,6 +93,8 @@ void uartSendCommand(unsigned char command, double data)
 void uartReadRaw(char* string, unsigned int length)
 {
     unsigned int i;
+    char temp;
+    int x;
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
@@ -84,5 +102,26 @@ void uartReadRaw(char* string, unsigned int length)
         
         /* Store character from transmission buffer */
         string[i] = UDR0;
+        if (i == (length - 1))
+        {
+            if (string[i] != 0x0A)
+            {
+                x = 0;
+                while (!x)
+                {
+                    while (!(UCSR0A & (1 << RXC0)));
+                    temp = UDR0;
+                    if (temp == 0x0A)
+                    {
+                        x = 1;
+                        for (i = 0; i < length; i++)
+                        {
+                            while (!(UCSR0A & (1 << RXC0)));
+                            string[i] = UDR0;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
