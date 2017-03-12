@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 {
     const char uartDevice[] = "/dev/serial0";
     FILE* serialDevice = uartInit(uartDevice);
-    uartSendCommand(serialDevice, 0x00, 0x00);
+    uartSendCommand(serialDevice, 0x00, 0x0000);
     
     sleep(10);
 
@@ -72,10 +72,15 @@ int main(int argc, char** argv)
                 }
             }
             uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
+            usleep(1000);
             uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
+            usleep(1000);
             uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
+            usleep(1000);
             uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
+            usleep(1000);
             uartSendCommand(serialDevice, YAW_CCW, yawCCW);
+            usleep(1000);
         }
         // Restrict rate
         usleep(1000);
