@@ -130,9 +130,9 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
     yall_kd = target_values->yaw_kd;
     
     /* Wait until the transmit buffer is populated. UDREn goes high when data register is empty. */
-    while (!(UCSR0A & (1 << UDRE0)));
+    // while (!(UCSR0A & (1 << UDRE0)));
     /* Put character in to transmission buffer */
-    UDR0 = (int8_t)(CURRENT_TUNING * 10);
+    // UDR0 = (int8_t)(CURRENT_TUNING * 10);
     
     roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);
     pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);
