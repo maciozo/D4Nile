@@ -27,6 +27,9 @@ int16_t throttleUp = 0; // Axis 1
 int16_t yawCCW = 0;       // Axis 0
 int16_t pitchForward = 0;  // Axis 5 (Joystick) Axis 13 (Motion)
 int16_t rollLeft = 0;      // Axis 2 (Joystick) Axis 11 (Motion)
+int16_t pidDec = 0;        // L1
+int16_t pidInc = 0;        // R1
+int16_t STAAAHP = 0;       // Touchpad button
 
 int main(int argc, char** argv)
 {
@@ -84,8 +87,29 @@ int main(int argc, char** argv)
             uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
           }
       }
-      else if (event.isAxis())
-      {
+    else if (event.number == 4)
+	  {
+	    pidDec = event.value;
+	    printf("pidDec is %s\n", event.value == 0 ? "up" : "down");
+            uartSendCommand(serialDevice, PID_DEC, pidDec);
+          }
+      }
+    else if (event.number == 5)
+	  {
+	    pidInc = event.value;
+	    printf("pidInc is %s\n", event.value == 0 ? "up" : "down");
+            uartSendCommand(serialDevice, PID_INC, pidInc);
+          }
+      }
+    else if (event.number == 13)
+	  {
+	    STAAAHP = event.value;
+	    printf("STAAAHP is %s\n", event.value == 0 ? "up" : "down");
+            uartSendCommand(serialDevice, STAHP, STAAAHP);
+          }
+      }
+    else if (event.isAxis())
+    {
 	if (modeButton && (event.number > 5 || event.number == 1))
 	{
 	  switch(event.number)
@@ -96,7 +120,7 @@ int main(int argc, char** argv)
 	    case 11: rollLeft = -event.value;
                      uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft); //Roll & Pitch axis swapped
 		     break;
-	    case 13: pitchForward = -event.value;
+	    case 13: pitchForward = event.value;
                      uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
 		     break;
 	  }
@@ -115,7 +139,7 @@ int main(int argc, char** argv)
 	    case 2 : rollLeft = event.value;
                      uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
 		     break;
-	    case 5 : pitchForward = event.value;
+	    case 5 : pitchForward = -event.value;
                      uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
 		     break;
 	  }
