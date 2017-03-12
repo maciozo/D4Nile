@@ -33,119 +33,124 @@ int16_t STAAAHP = 0;       // Touchpad button
 
 int main(int argc, char** argv)
 {
-  const char uartDevice[] = "/dev/serial0";
-  FILE* serialDevice = uartInit(uartDevice);
+    const char uartDevice[] = "/dev/serial0";
+    FILE* serialDevice = uartInit(uartDevice);
 
-// Create an instance of Joystick
-  Joystick joystick("/dev/input/js0");
+    // Create an instance of Joystick
+    Joystick joystick("/dev/input/js0");
 
-  // Ensure that it was found and that we can use it
-  if (joystick.isFound())
-  {
-    printf("Joystick Connected.\n");
-  }
-  else
-  {
-    printf("Joystick not detected, exiting.\n");
-    exit(1);
-  }
-
-  while (true)
-  {
-    // Restrict rate
-    usleep(1000);
-    //uartSendCommand(serialDevice, MODE_BUTTON, modeButton);
-    //uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
-    //uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
-    //uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
-    //uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
-    //uartSendCommand(serialDevice, YAW_CCW, yawCCW);
-
-    // Attempt to sample an event from the joystick
-    JoystickEvent event;
-    if (joystick.sample(&event))
+    // Ensure that it was found and that we can use it
+    if (joystick.isFound())
     {
-      if (event.isButton())
-      {
-	if (event.number == 1)
-	  {
-	    modeButton = event.value;
-	    printf("Button %u is %s\n", event.number, modeButton == 0 ? "up" : "down");
-            uartSendCommand(serialDevice, MODE_BUTTON, modeButton);
-
-            if (event.value == 0)
-	    {
-	      pitchForward = 0;
-	      rollLeft = 0;
-	      printf("Pitch and Roll reset, now in JOYSTICK mode\n");
-	    }
-	  }
-	else if (event.number == 0)
-	  {
-	    servoButton = event.value;
-	    printf("Button %u is %s\n", event.number, servoButton == 0 ? "up" : "down");
-            uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
-          }
-      }
-    else if (event.number == 4)
-	  {
-	    pidDec = event.value;
-	    printf("pidDec is %s\n", event.value == 0 ? "up" : "down");
-            uartSendCommand(serialDevice, PID_DEC, pidDec);
-          }
-      }
-    else if (event.number == 5)
-	  {
-	    pidInc = event.value;
-	    printf("pidInc is %s\n", event.value == 0 ? "up" : "down");
-            uartSendCommand(serialDevice, PID_INC, pidInc);
-          }
-      }
-    else if (event.number == 13)
-	  {
-	    STAAAHP = event.value;
-	    printf("STAAAHP is %s\n", event.value == 0 ? "up" : "down");
-            uartSendCommand(serialDevice, STAHP, STAAAHP);
-          }
-      }
-    else if (event.isAxis())
-    {
-	if (modeButton && (event.number > 5 || event.number == 1))
-	{
-	  switch(event.number)
-	  {
-	    case 1 : throttleUp = -event.value;
-                     uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
-		     break;
-	    case 11: rollLeft = -event.value;
-                     uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft); //Roll & Pitch axis swapped
-		     break;
-	    case 13: pitchForward = event.value;
-                     uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
-		     break;
-	  }
-	printf("MOTION Throttle: %6d, Roll: %6d, Pitch: %6d\n", throttleUp, rollLeft, pitchForward);
-	}
-	else if (modeButton == 0 && event.number <= 5)
-	{
-	  switch(event.number)
-	  {
-	    case 0 : yawCCW = -event.value;
-                     uartSendCommand(serialDevice, YAW_CCW, yawCCW);
-		     break;
-	    case 1 : throttleUp = -event.value;
-                     uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
-		     break;
-	    case 2 : rollLeft = event.value;
-                     uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
-		     break;
-	    case 5 : pitchForward = -event.value;
-                     uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
-		     break;
-	  }
-	printf("JOYSTICK Throttle: %6d, Yaw: %6d, Roll: %6d, Pitch: %6d\n", throttleUp, yawCCW, rollLeft, pitchForward);
-	}	
-      }
+        printf("Joystick Connected.\n");
     }
-  }
+    else
+    {
+        printf("Joystick not detected, exiting.\n");
+        exit(1);
+    }
+
+    while (true)
+    {
+        // Restrict rate
+        usleep(1000);
+        //uartSendCommand(serialDevice, MODE_BUTTON, modeButton);
+        //uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
+        //uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
+        //uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
+        //uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
+        //uartSendCommand(serialDevice, YAW_CCW, yawCCW);
+
+        // Attempt to sample an event from the joystick
+        JoystickEvent event;
+        if (joystick.sample(&event))
+        {
+            if (event.isButton())
+            {
+                if (event.number == 1)
+                {
+                    modeButton = event.value;
+                    printf("Button %u is %s\n", event.number, modeButton == 0 ? "up" : "down");
+                    // uartSendCommand(serialDevice, MODE_BUTTON, modeButton);
+
+                    if (event.value == 0)
+                    {
+                        pitchForward = 0;
+                        rollLeft = 0;
+                        printf("Pitch and Roll reset, now in JOYSTICK mode\n");
+                    }
+                }
+                else if (event.number == 0)
+                {
+                    servoButton = event.value;
+                    printf("Button %u is %s\n", event.number, servoButton == 0 ? "up" : "down");
+                    uartSendCommand(serialDevice, SERVO_BUTTON, servoButton);
+                }
+                else if (event.number == 4)
+                {
+                    pidDec = event.value;
+                    printf("pidDec is %s\n", event.value == 0 ? "up" : "down");
+                    uartSendCommand(serialDevice, PID_DEC, pidDec);
+                }
+                else if (event.number == 5)
+                {
+                    pidInc = event.value;
+                    printf("pidInc is %s\n", event.value == 0 ? "up" : "down");
+                    uartSendCommand(serialDevice, PID_INC, pidInc);
+                }
+                else if (event.number == 13)
+                {
+                    STAAAHP = event.value;
+                    printf("STAAAHP is %s\n", event.value == 0 ? "up" : "down");
+                    uartSendCommand(serialDevice, STAHP, STAAAHP);
+                }
+            }
+
+            else if (event.isAxis())
+            {
+                if (modeButton && (event.number > 5 || event.number == 1))
+                {
+                    switch(event.number)
+                    {
+                    case 1 :
+                        throttleUp = -event.value;
+                        uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
+                        break;
+                    case 11:
+                        rollLeft = -event.value;
+                        uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft); //Roll & Pitch axis swapped
+                        break;
+                    case 13:
+                        pitchForward = event.value;
+                        uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
+                        break;
+                    }
+                    printf("MOTION Throttle: %6d, Roll: %6d, Pitch: %6d\n", throttleUp, rollLeft, pitchForward);
+                }
+                else if (modeButton == 0 && event.number <= 5)
+                {
+                    switch(event.number)
+                    {
+                    case 0 :
+                        yawCCW = -event.value;
+                        uartSendCommand(serialDevice, YAW_CCW, yawCCW);
+                        break;
+                    case 1 :
+                        throttleUp = -event.value;
+                        uartSendCommand(serialDevice, THROTTLE_UP, throttleUp);
+                        break;
+                    case 2 :
+                        rollLeft = event.value;
+                        uartSendCommand(serialDevice, PITCH_FORWARD, rollLeft);
+                        break;
+                    case 5 :
+                        pitchForward = -event.value;
+                        uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
+                        break;
+                    }
+                printf("JOYSTICK Throttle: %6d, Yaw: %6d, Roll: %6d, Pitch: %6d\n", throttleUp, yawCCW, rollLeft, pitchForward);
+                }
+            }
+        }
+    }
 }
