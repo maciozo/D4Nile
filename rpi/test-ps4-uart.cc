@@ -64,7 +64,7 @@ int main(int argc, char** argv)
             {
                 if (event.isButton())
                 {
-                    if (event.number == 0)
+                    if ((event.number == 0) & (event.value == 1))
                     {
                         start = true;
                         break;
