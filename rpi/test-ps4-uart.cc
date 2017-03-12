@@ -43,6 +43,7 @@ int main(int argc, char** argv)
     printf("Waiting for controller...\n");
     while (!(joystick.isFound()))
     {
+        Joystick joystick("/dev/input/js0");
         usleep(1000);
     }
     printf("Connected\n");
@@ -64,6 +65,7 @@ int main(int argc, char** argv)
             printf("Waiting for controller...\n");
             while (!(joystick.isFound()))
             {
+                Joystick joystick("/dev/input/js0");
                 usleep(1000);
             }
             printf("Connected\n");
