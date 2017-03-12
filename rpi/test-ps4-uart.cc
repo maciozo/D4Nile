@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     
     while(true)
     {
-        if joystick.isFound()
+        if (joystick.isFound())
         {
             printf("Joystick Connected");
             break;
