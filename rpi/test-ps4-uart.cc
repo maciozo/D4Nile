@@ -35,18 +35,35 @@ int main(int argc, char** argv)
 {
     const char uartDevice[] = "/dev/serial0";
     FILE* serialDevice = uartInit(uartDevice);
+    FILE* js0 = NULL;
+    
+    printf("Waiting for controller...\n");
+    while (js0 == NULL)
+    {
+        usleep(100000L);
+        js0 = fopen("/dev/input/js0", "r");
+        if (js0 == NULL)
+        {
+            fclose(js0);
+        }
+    }
+    fclose(js0);
 
     // Create an instance of Joystick
     Joystick joystick("/dev/input/js0");
+    if (joystick.isFound())
+    {
+        printf("Connected\n");
+    }
 
     // Ensure that it was found and that we can use it
-    printf("Waiting for controller...\n");
-    while (!(joystick.isFound()))
-    {
-        Joystick joystick("/dev/input/js0");
-        usleep(1000);
-    }
-    printf("Connected\n");
+    // printf("Waiting for controller...\n");
+    // while (!(joystick.isFound()))
+    // {
+        // Joystick joystick("/dev/input/js0");
+        // usleep(1000);
+    // }
+    // printf("Connected\n");
 
     while (true)
     {
@@ -59,17 +76,17 @@ int main(int argc, char** argv)
         //uartSendCommand(serialDevice, ROLL_LEFT, pitchForward);
         //uartSendCommand(serialDevice, YAW_CCW, yawCCW);
         
-        if (!(joystick.isFound()))
-        {
-            printf("Controller disconnected\n");
-            printf("Waiting for controller...\n");
-            while (!(joystick.isFound()))
-            {
-                Joystick joystick("/dev/input/js0");
-                usleep(1000);
-            }
-            printf("Connected\n");
-        }
+        // if (!(joystick.isFound()))
+        // {
+            // printf("Controller disconnected\n");
+            // printf("Waiting for controller...\n");
+            // while (!(joystick.isFound()))
+            // {
+                // Joystick joystick("/dev/input/js0");
+                // usleep(1000);
+            // }
+            // printf("Connected\n");
+        // }
 
         // Attempt to sample an event from the joystick
         JoystickEvent event;
