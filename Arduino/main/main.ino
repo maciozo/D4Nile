@@ -24,6 +24,11 @@ float data[] = {0.0, 0.0, 0.0};
 
 void setup(void)
 {
+    // debug("SENSINIT", 8);
+    init_sensor();
+    
+    delay(20000);
+    
     initDebug();
     // debug("SETUP", 8);
     #ifndef GAIN_TUNING
@@ -43,8 +48,7 @@ void setup(void)
     #ifndef DEBUG
         init_pwm();
     #endif
-    // debug("SENSINIT", 8);
-    init_sensor();
+    
     // debug("PID INIT", 8);
     init_pid();
     

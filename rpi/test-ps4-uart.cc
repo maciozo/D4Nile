@@ -35,6 +35,7 @@ int main(int argc, char** argv)
 {
     const char uartDevice[] = "/dev/serial0";
     FILE* serialDevice = uartInit(uartDevice);
+    uartSendCommand(serialDevice, 0x00, 0x00);
     
     sleep(10);
 
