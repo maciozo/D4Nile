@@ -3,7 +3,6 @@
 
     /* Include variables for tuning PID gain the the commandData struct */
     #define GAIN_TUNING
-    #define CURRENT_TUNING roll_kp
 
     /* Baud rate between RPi and Seeeduino */
     #define UART_BAUD 115200
@@ -19,11 +18,9 @@
     #define PITCH_FORWARD 0x23
 
     /* Buttons */
-    #define MODE_BUTTON 0x24 // unnecessary
+    #define MODE_BUTTON 0x24
     #define SERVO_BUTTON 0x25
     #define AUTOLAND 0x26
-    #define PID_DEC 0x31
-    #define PID_INC 0x32
     
     /* Meta */
     #define STATUS 0x27

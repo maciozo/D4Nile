@@ -71,17 +71,6 @@ int formatData(commanddata_t* commandData, char* rawdata)
             commandData->yaw_kd = tempData;
             break;
             
-        case PID_DEC:
-            if (commandData->CURRENT_TUNING > 0)
-            {
-                commandData->CURRENT_TUNING -= (rawdata[2] & 1) * 0.1;
-            }
-            break;
-            
-        case PID_INC
-            commandData->CURRENT_TUNING += (rawdata[2] & 1) * 0.1;
-            break;
-            
         default:
             return 1;
     }

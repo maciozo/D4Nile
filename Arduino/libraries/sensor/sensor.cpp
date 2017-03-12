@@ -28,9 +28,9 @@ double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
 double left_front, right_front, left_back, right_back;
 
-double roll_kp=0, roll_ki=0, roll_kd=0;
-double pitch_kp=0, pitch_ki=0, pitch_kd=0;
-double yall_kp=0, yall_ki=0, yall_kd=0;
+double roll_kp=10, roll_ki=0, roll_kd=0;
+double pitch_kp=10, pitch_ki=0, pitch_kd=0;
+double yall_kp=10, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -112,22 +112,6 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
     pitch_setpoint = target_values->pitch_forward;
     yall_setpoint = target_values->yaw_ccw;
     altitude_coeff = target_values->throttle_up;
-    
-    /* FOR PID TUNING */
-    roll_kp = target_values->roll_kp;
-    roll_ki = target_values->roll_ki;
-    roll_kd = target_values->roll_kd;
-    pitch_kp = target_values->pitch_kp;
-    pitch_ki = target_values->pitch_ki;
-    pitch_kd = target_values->pitch_kd;
-    yall_kp = target_values->yall_kp;
-    yall_ki = target_values->yall_ki;
-    yall_kd = target_values->yall_kd;
-    
-    roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);
-    pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);
-    yall_PID.SetTunings(yall_kp, yall_ki, yall_kd);
-    /* ============== */
 
     roll_angle = ypr[2] * 180/M_PI; 
     pitch_angle = ypr[1] * 180/M_PI;
@@ -221,7 +205,7 @@ void init_pwm(void)
     OCR0B = 62;
     OCR2A = 62;
     OCR2B = 62;
-    delay(1000);
+    delay(2000);
     OCR0A = 68;
     OCR0B = 68;
     OCR2A = 68;
