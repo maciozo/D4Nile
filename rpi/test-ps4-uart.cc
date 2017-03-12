@@ -56,6 +56,7 @@ int main(int argc, char** argv)
             {
                 connected = true;
                 printf("Joystick Connected.\n");
+                break;
             }
         }
     }
