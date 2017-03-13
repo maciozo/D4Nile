@@ -8,6 +8,9 @@ exports.init_serial = function(location) {
 		baudRate: 115200,
 		parser: SerialPort.parsers.byteLength(3) // 3 byte chunks
 	});
+	port.on('error', error => {
+		throw new Error('serial not connected');
+	});
 }
 
 // register a handler to handle serial messages

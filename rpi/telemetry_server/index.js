@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -76,6 +77,9 @@ UART.on_message(command => {
 });
 
 const controller = new joystick(0,3500,350);
+controller.on('error', () => {
+	throw new Error('controller not connected');
+});
 // analogue inputs: triggers, gyro, sticks
 controller.on('axis', data => {
 	if (data.number == 2) { // Right Stick horizontal
