@@ -80,31 +80,9 @@ void loop(void)
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
 void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_data)
 {
-    // if (sensor_data->yaw_ccw != old_sensor_data->yaw_ccw)
-    // {
-        uartSendCommand(YAW_CCW, (int16_t)((sensor_data->yaw_ccw) * 32767 / 90));
-        // old_sensor_data->yaw_ccw = sensor_data->yaw_ccw;
-    // }
-    
-    // if (sensor_data->throttle_up != old_sensor_data->throttle_up)
-    // {
-        // uartSendCommand(THROTTLE_UP, (int16_t)((sensor_data->throttle_up - 1) * 327670));
-        // old_sensor_data->throttle_up = sensor_data->throttle_up;
-    // }
-    
-    // if (sensor_data->roll_left != old_sensor_data->roll_left)
-    // {
-        uartSendCommand(ROLL_LEFT, (int16_t)((sensor_data->roll_left) * 32767 / 10));
-        // old_sensor_data->roll_left = sensor_data->roll_left;
-    // }
-    
-    // if (sensor_data->pitch_forward != old_sensor_data->pitch_forward)
-    // {
-        uartSendCommand(PITCH_FORWARD, (int16_t)((sensor_data->pitch_forward) * 32767 / 10));
-        // old_sensor_data->pitch_forward = sensor_data->pitch_forward;
-    // }
-    
-
+    uartSendCommand(YAW_CCW, (int16_t)((sensor_data->yaw_ccw) * 32767 / 90));
+    uartSendCommand(ROLL_LEFT, (int16_t)((sensor_data->roll_left) * 32767 / 10));
+    uartSendCommand(PITCH_FORWARD, (int16_t)((sensor_data->pitch_forward) * 32767 / 10));
 }
 
 void initDebug()
