@@ -4,7 +4,10 @@
 #define INTERRUPT_PIN 2
 #define minPWM 2000
 #define maxPWM 4000
-#define thrust 3000
+#define thrust 2300
+
+#define echoPin 3 // Echo Pin
+#define trigPin 2 // Trigger Pin
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
@@ -17,6 +20,8 @@ void init_pid();
 void dmpDataReady();
 void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, float* data);
 void init_pwm(void);
-void change_pwm(int left_front, int left_back, int right_front, int right_back);
+void change_pwm(double left_front, double left_back, double right_front, double right_back);
+int init_sonar();
+int read_ultrasonic();
 
 #endif /* SENSOR_H_ */

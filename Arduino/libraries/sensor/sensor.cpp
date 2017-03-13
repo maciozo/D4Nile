@@ -5,6 +5,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "commandData.h"
+#include "uart.h"
 
 MPU6050 mpu;
 
@@ -20,16 +21,17 @@ Quaternion q;           // [w, x, y, z]         quaternion container
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 int16_t gx, gy, gz;
+int16_t gyro[3];
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
 double roll_setpoint, pitch_setpoint, yall_setpoint, altitude_coeff;
 double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
-int left_front, right_front, left_back, right_back;
+double left_front, right_front, left_back, right_back;
 
-double roll_kp=5, roll_ki=0, roll_kd=0;
-double pitch_kp=5, pitch_ki=0, pitch_kd=0;
-double yall_kp=2, yall_ki=0, yall_kd=0;
+double roll_kp=10, roll_ki=0, roll_kd=0;
+double pitch_kp=10, pitch_ki=0, pitch_kd=0;
+double yall_kp=10, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -114,16 +116,42 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
 
     roll_angle = ypr[2] * 180/M_PI; 
     pitch_angle = ypr[1] * 180/M_PI;
-    yall_angular_vel = gz/728;
+    yall_angular_vel = gyro[2];
+    
+    /* PID Tuning */
+    // roll_kp = target_values->roll_kp;
+    // roll_ki = target_values->roll_ki;
+    // roll_kd = target_values->roll_kd;
+    // pitch_kp = target_values->pitch_kp;
+    // pitch_ki = target_values->pitch_ki;
+    // pitch_kd = target_values->roll_kd;
+    // yall_kp = target_values->yaw_kp;
+    // yall_ki = target_values->yaw_ki;
+    // yall_kd = target_values->yaw_kd;
+    
+    /* Wait until the transmit buffer is populated. UDREn goes high when data register is empty. */
+    // while (!(UCSR0A & (1 << UDRE0)));
+    /* Put character in to transmission buffer */
+    // UDR0 = (int8_t)(CURRENT_TUNING * 10);
+    
+    roll_PID.SetTunings(roll_kp, roll_ki, roll_kd);
+    pitch_PID.SetTunings(pitch_kp, pitch_ki, pitch_kd);
+    yall_PID.SetTunings(yall_kp, yall_ki, yall_kd);
+    /* ---------- */
 
     roll_PID.Compute();
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    left_front = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    right_back = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
     right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
     left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    right_back = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    left_front = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    
+    // left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
+    // right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
+    // left_back = thrust*altitude_coeff + pitch_setpoint*10 + roll_setpoint*10 + yall_setpoint;
+    // right_back = thrust*altitude_coeff + pitch_setpoint*10 - roll_setpoint*10 - yall_setpoint;
 
        
     // set motor limits
@@ -138,6 +166,15 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
         
     if (left_front > maxPWM) left_front = maxPWM;
         else if (left_front < minPWM) left_front = minPWM;
+        
+    if (target_values->servo_button)
+    {
+        OCR1A = 24 // Set OCR for servo to open
+    }
+    else
+    {
+        OCR1A = 12; //Set OCR for servo to closed
+    }
 
     change_pwm(left_front, left_back, right_front, right_back);
 
@@ -163,16 +200,17 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
         mpu.dmpGetGravity(&gravity, &q);
         mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
         mpu.getRotation(&gx, &gy, &gz);
+        mpu.dmpGetGyro(gyro,fifoBuffer);
         mpuIntStatus = mpu.getIntStatus();
 
         unsigned long time = millis();
     }
     
-    // sensor_data->yaw_ccw = (double)(gz/728.0);
-    // sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
-    // sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
+    sensor_data->yaw_ccw = (double)gyro[2];
+    sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
+    sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
     
-    data[0] = gz/728;
+    data[0] = gyro[2];
     data[1] = ypr[1]* 180/M_PI;
     data[2] = ypr[2]* 180/M_PI;
 }
@@ -189,7 +227,7 @@ void init_pwm(void)
     TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
     TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
 
-    //select clock to give prescaler 256, giving a frequency of --Hz
+    //select clock to give prescaler 256, giving a frequency of 244Hz
     TCCR0B = _BV(CS02);
     TCCR2B = _BV(CS22) | _BV(CS21);
 
@@ -198,13 +236,39 @@ void init_pwm(void)
     OCR0B = 62;
     OCR2A = 62;
     OCR2B = 62;
+    delay(2000);
+    OCR0A = 68;
+    OCR0B = 68;
+    OCR2A = 68;
+    OCR2B = 68;
 }
 
-void change_pwm(int left_front, int left_back, int right_front, int right_back)
+void change_pwm(double left_front, double left_back, double right_front, double right_back)
 {
-    OCR0A = left_front/33;		//divide input by 33 to put it in duty cycle range
-    OCR0B = left_back/33;
-    OCR2A = right_front/33;
-    OCR2B = right_back/33;
+    OCR0A = right_front/33.3; //divide input by 33 to put it in duty cycle range
+    OCR0B = left_front/33.3;
+    OCR2A = right_back/33.3;
+    OCR2B = left_back/33.3;
 }
 
+init_sonar()
+{
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+
+int read_ultrasonic()
+{
+  digitalWrite(trigPin, LOW); 
+  delayMicroseconds(2); 
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10); 
+ 
+  digitalWrite(trigPin, LOW);
+  int duration = pulseIn(echoPin, HIGH);
+  int distance = duration/58.2;
+
+  return distance;
+}
