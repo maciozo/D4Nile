@@ -42,7 +42,7 @@ int uartSendRaw(FILE* uartDevice, char* string, size_t length)
 
 int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
 {
-    char toSend[SENDBUFFER_SIZE];
+    char toSend[SENDBUFFER_SIZE + 2];
     
     /*
         Convert 8 bit command and 16 bit data in to a 24 bit string.
@@ -54,9 +54,8 @@ int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
     toSend[2] = (char)(data >> 8);
     toSend[3] = (char)(data & 0x00FF);
     toSend[4] = (char)UART_STOP;
-    // toSend[3] = (char)'\n';
     
-    uartSendRaw(uartDevice, toSend, SENDBUFFER_SIZE);
+    uartSendRaw(uartDevice, toSend, SENDBUFFER_SIZE + 2);
     
     return 0;
 }
