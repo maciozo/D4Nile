@@ -44,6 +44,18 @@ document.onkeydown = function(event) {
 		case 40: // down
 			socket_send({command: 'PITCH', data: -32000});
 			break;
+		case 87: // w
+			socket_send({command: 'THROTTLE', data: 32000});
+			break;
+		case 65: // a
+			socket_send({command: 'YAW', data: -32000});
+			break;
+		case 83: // s
+			socket_send({command: 'THROTTLE', data: -32000});
+			break;
+		case 68: // d
+			socket_send({command: 'YAW', data: 32000});
+			break;
 	}
 }
 

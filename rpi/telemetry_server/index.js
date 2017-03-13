@@ -41,6 +41,8 @@ wss.on('connection', ws => {
 			case 'YAW_KD':
 			case 'ROLL':
 			case 'PITCH':
+			case 'YAW':
+			case 'THROTTLE':
 				UART.send_message(message.command, message.data);
 				break;
 			default:

@@ -47,7 +47,7 @@ function code_to_command(buffer) {
 // serialise a command to binary
 function command_to_code(command, data) {
 	let buf = Buffer.alloc(5);
-	buf.writeUInt8(0x7E, 1); // UART start
+	buf.writeUInt8(0x7E, 0); // UART start
 	switch(command) {
 		case 'ROLL': 
 			buf.writeUInt8(0x22, 1);
