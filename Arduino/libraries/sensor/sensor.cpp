@@ -208,30 +208,33 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
 
 void init_pwm(void)
 {
-    //set output pins for OCRs
-    DDRB |= _BV(PB3);
-    DDRD |= _BV(PD5);
-    DDRD |= _BV(PD6);
-    DDRD |= _BV(PD3);
+//set output pins for OCRs
+        DDRB |= _BV(PB3);
+        DDRD |= _BV(PD5);
+        DDRD |= _BV(PD6);
+        DDRD |= _BV(PD3);
 
-    //set non-inverting mode fast PWM with top value 0xFF (not OCR)
-    TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
-    TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
+        DDRB |= _BV(PB1);
 
-    //select clock to give prescaler 256, giving a frequency of 244Hz
-    TCCR0B = _BV(CS02);
-    TCCR2B = _BV(CS22) | _BV(CS21);
+        //set non-inverting mode fast PWM with top value 0xFF (not OCR)
+        TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
+        TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21);
+        //set non-inverting mode fast PWM with top value 0xFF (not OCR) set to 8bit from 16bit
+        TCCR1A = _BV(COM1A1)| _BV(WGM10);
 
-    //set initial value for OCRs
-    OCR0A = 62;
-    OCR0B = 62;
-    OCR2A = 62;
-    OCR2B = 62;
-    delay(2000);
-    OCR0A = 68;
-    OCR0B = 68;
-    OCR2A = 68;
-    OCR2B = 68;
+        //select clock to give prescaler 256, giving a frequency of 244Hz
+        TCCR0B = _BV(CS02);
+        TCCR2B = _BV(CS22) | _BV(CS21);
+        //select clock to give prescaler 1024, giving a frequency of 61Hz
+        TCCR1B = _BV(CS12) | _BV(CS10) | _BV(WGM12);
+
+        //set initial value for OCRs
+        OCR0A = 62;
+        OCR0B = 62;
+        OCR2A = 62;
+        OCR2B = 62;
+        //servo output compare register setup.
+        OCR1A = 12;
 }
 
 void change_pwm(double left_front, double left_back, double right_front, double right_back)
@@ -246,6 +249,7 @@ init_sonar()
 {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(batteryRead, INPUT);
 }
 
 
@@ -262,4 +266,11 @@ int read_ultrasonic()
   int distance = duration/58.2;
 
   return distance;
+}
+
+float batteryVoltage()
+{
+    float voltage = analogRead(batteryRead);
+    voltage=((voltage *5)/1024)*3.1839;
+    return voltage;
 }
