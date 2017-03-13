@@ -48,7 +48,7 @@ wss.on('connection', ws => {
 	});
 });
 //////////////// END WEB SERVER AND WEBSOCKETS ////////////////
-/*
+
 //////////////// BEGIN PS4 CONTROLLER AND SERIAL ////////////////
 const attitude = {
 	roll: 0,
@@ -65,7 +65,10 @@ UART.on_message(command => {
 			// update relevant attitude field
 			attitude[command.command.toLowerCase()] = command.data;
 			// send new attitude to connected clients
-			broadcast(attitude);
+			broadcast({command: 'ATTITUDE', data: attitude});
+			break;
+		case 'VOLTAGE':
+			broadcast({command: 'VOLTAGE', data: command.data});
 			break;
 		default:
 			console.log('Unhandled command from flight control', command);
@@ -79,23 +82,26 @@ controller.on('axis', data => {
 		// convert number to degrees between -10,+10
 		const angle = (data.value/32768)*10;
 		attitude.roll = angle;
-		UART.send_message('ROLL', angle);
+		UART.send_message('ROLL', data.value);
 	} else if (data.number == 5) { // Right Stick vertical
 		// convert number to degrees between -10,+10
 		const angle = (data.value/32768)*10;
 		attitude.pitch = angle;
-		UART.send_message('PITCH', angle);
+		UART.send_message('PITCH', data.value);
 	} else if (data.number == 0) { // Left Stick horizontal
 		// convert number to angular velocity in degrees/s between -45,45
 		const rate = (data.value/32768)*45;
-		UART.send_message('YAW', rate);
+		UART.send_message('YAW', data.value);
 	} else if (data.number == 1) { // Left Stick vertical
 		// convert number to throttle between 0.95,1.0
 		const throttle = (data.value/655360)+1;
-		UART.send_message('THROTTLE', throttle); 
+		UART.send_message('THROTTLE', -data.value); 
 	}
 });
-// TODO: digital inputs (buttons)
+controller.on('button', data => {
+	if (data.number == 13) { // trackpad
+		UART.send_message('KILL');
+	}
+});
 
 //////////////// END PS4 CONTROLLER AND SERIAL ////////////////
-*/
