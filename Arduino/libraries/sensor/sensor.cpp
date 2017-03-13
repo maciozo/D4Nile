@@ -169,7 +169,7 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
         
     if (target_values->servo_button)
     {
-        OCR1A = 24 // Set OCR for servo to open
+        OCR1A = 24; // Set OCR for servo to open
     }
     else
     {
@@ -252,10 +252,11 @@ void change_pwm(double left_front, double left_back, double right_front, double 
     OCR2B = left_back/33.3;
 }
 
-init_sonar()
+void init_sonar()
 {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  pinMode(batteryRead, INPUT);
 }
 
 
@@ -277,6 +278,6 @@ int read_ultrasonic()
 float batteryVoltage()
 {
     float voltage = analogRead(batteryRead);
-    voltage=(((voltage * 3.3) / 1024) * 4.274) - 0.03;
+    voltage = (((voltage * 3.3) / 1024) * 4.274) - 0.03;
     return voltage;
 }

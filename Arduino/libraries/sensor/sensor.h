@@ -9,6 +9,8 @@
 #define echoPin 3 // Echo Pin
 #define trigPin 2 // Trigger Pin
 
+#define batteryRead A0
+
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     #include "Wire.h"
 #endif
@@ -18,10 +20,10 @@
 void init_sensor();
 void init_pid();
 void dmpDataReady();
-void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, float* data);
+void do_everything(commanddata_t* sensor_data, commanddata_t* target_values);
 void init_pwm(void);
 void change_pwm(double left_front, double left_back, double right_front, double right_back);
-int init_sonar();
+void init_sonar();
 int read_ultrasonic();
 
 #endif /* SENSOR_H_ */

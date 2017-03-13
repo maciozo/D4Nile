@@ -37,7 +37,7 @@ void uartSendRaw(char* string, unsigned int length);
     uint8_t command: What the data is describing. Refer to constants.h
     int16_t data: The payload to send
 */
-void uartSendCommand(unsigned char command, int16_t data);
+void uartSendCommand(char command, int16_t data);
 
 /* Read a string from UART
     char* string: Pointer to the received string to be placed in
