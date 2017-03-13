@@ -78,6 +78,7 @@ UART.on_message(command => {
 
 const controller = new joystick(0,3500,350);
 controller.on('error', () => {
+	UART.send_message('KILL');
 	throw new Error('controller not connected');
 });
 // analogue inputs: triggers, gyro, sticks

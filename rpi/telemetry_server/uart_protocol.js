@@ -6,7 +6,7 @@ let port;
 exports.init_serial = function(location) {
 	port = new SerialPort(location, {
 		baudRate: 115200,
-		parser: SerialPort.parsers.byteLength(5) // 3 byte chunks
+		parser: SerialPort.parsers.byteLength(5) // 5 byte chunks
 	});
 	port.on('error', error => {
 		throw new Error('serial not connected');
