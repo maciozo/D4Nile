@@ -33,7 +33,7 @@ exports.send_message = function(command, data) {
 
 // convert a binary buffer into an Object with the command
 function code_to_command(buffer) {
-	switch(buffer.readUInt8(2)) {
+	switch(buffer.readUInt8(1)) {
 		case 0x22: return {command: 'ROLL', data: buffer.readUInt16BE(3)};
 		case 0x23: return {command: 'PITCH', data: buffer.readUInt16BE(3)};
 		case 0x20: return {command: 'YAW', data: buffer.readUInt16BE(3)}; 
