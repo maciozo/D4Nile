@@ -10,9 +10,9 @@ typedef struct
     double throttle_up;
     double roll_left;
     double pitch_forward;
-    double mode_button;
-    double servo_button;
-    double autoland;
+    int8_t mode_button;
+    int8_t servo_button;
+    int8_t autoland;
     #ifdef GAIN_TUNING
         double roll_kp;
         double roll_ki;

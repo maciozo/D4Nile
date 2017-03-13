@@ -24,43 +24,49 @@ float data[] = {0.0, 0.0, 0.0};
 
 void setup(void)
 {
+    // debug("SENSINIT", 8);
+    init_sensor();
+    init_sonar();
+    delay(20000);
+    
     initDebug();
     // debug("SETUP", 8);
     #ifndef GAIN_TUNING
-        target_values = {0, 0, 0, 0, 0, 0, 0};
+        target_values = {0, 1.0, 0, 0, 0, 0, 0};
         sensor_data = {0, 0, 0, 0, 0, 0, 0};
         old_sensor_data = {0, 0, 0, 0, 0, 0, 0};
     #else
-        target_values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        target_values = {0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         old_sensor_data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     #endif
     
-    debug("UARTINIT", 8);
+    // debug("UARTINIT", 8);
     uartInit();
-    uartSendCommand(STATUS, INITIALISING);
+    // uartSendCommand(STATUS, INITIALISING);
     
     #ifndef DEBUG
         init_pwm();
     #endif
-    debug("SENSINIT", 8);
-    init_sensor();
-    debug("PID INIT", 8);
+    
+    // debug("PID INIT", 8);
     init_pid();
     
-    uartSendCommand(STATUS, READY);
-    debug("READY", 8);
+    // uartSendCommand(STATUS, READY);
+    // debug("READY", 8);
 }
 
 void loop(void)
 {
     /* Get command from UART */
     // debug("READUART", 8);
-    uartReadRaw(recvBuffer, MC_RECVBUFFER_SIZE);
-    
-    /* Put the new command in to the target_values struct */
-    // debug("FORMDATA", 8);
-    formatData(&target_values, recvBuffer);
+    if (UCSR0A & (1 << RXC0))
+    {
+        uartReadRaw(recvBuffer, MC_RECVBUFFER_SIZE);
+        /* Put the new command in to the target_values struct */
+        // debug("FORMDATA", 8);
+        formatData(&target_values, recvBuffer);
+    }
     
     /* Do PID calculations to get the real sensor values towards the target values */
     // debug("DE  LOOP", 8);
@@ -68,55 +74,15 @@ void loop(void)
     
     /* Send any sensor values that have changed since they were last sent */
     // debug("SENDUART", 8);
-    // sendNewSensorData(&sensor_data, &old_sensor_data);
+    sendNewSensorData(&sensor_data, &old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */
 void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_data)
 {
-    // if (sensor_data->yaw_ccw != old_sensor_data->yaw_ccw)
-    // {
-        uartSendCommand(YAW_CCW, sensor_data->yaw_ccw);
-        old_sensor_data->yaw_ccw = sensor_data->yaw_ccw;
-    // }
-    
-    // if (sensor_data->throttle_up != old_sensor_data->throttle_up)
-    // {
-        uartSendCommand(THROTTLE_UP, sensor_data->throttle_up);
-        old_sensor_data->throttle_up = sensor_data->throttle_up;
-    // }
-    
-    // if (sensor_data->roll_left != old_sensor_data->roll_left)
-    // {
-        uartSendCommand(ROLL_LEFT, sensor_data->roll_left);
-        old_sensor_data->roll_left = sensor_data->roll_left;
-    // }
-    
-    // if (sensor_data->pitch_forward != old_sensor_data->pitch_forward)
-    // {
-        uartSendCommand(PITCH_FORWARD, sensor_data->pitch_forward);
-        old_sensor_data->pitch_forward = sensor_data->pitch_forward;
-    // }
-    
-    // if (sensor_data->mode_button != old_sensor_data->mode_button)
-    // {
-        uartSendCommand(MODE_BUTTON, sensor_data->mode_button);
-        old_sensor_data->mode_button = sensor_data->mode_button;
-    // }
-    
-    // if (sensor_data->servo_button != old_sensor_data->servo_button)
-    // {
-        uartSendCommand(SERVO_BUTTON, sensor_data->servo_button);
-        old_sensor_data->servo_button = sensor_data->servo_button;
-    // }
-    
-    // if (sensor_data->autoland != old_sensor_data->autoland)
-    // {
-        uartSendCommand(AUTOLAND, sensor_data->autoland);
-        old_sensor_data->autoland = sensor_data->autoland;
-    // }
-    
-
+    uartSendCommand(YAW_CCW, (int16_t)((sensor_data->yaw_ccw) * 32767 / 90));
+    uartSendCommand(ROLL_LEFT, (int16_t)((sensor_data->roll_left) * 32767 / 10));
+    uartSendCommand(PITCH_FORWARD, (int16_t)((sensor_data->pitch_forward) * 32767 / 10));
 }
 
 void initDebug()
