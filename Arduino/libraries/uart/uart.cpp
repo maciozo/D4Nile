@@ -106,7 +106,9 @@ void uartReadRaw(char* string, unsigned int length)
     }
     if (UDR0 != (char)UART_STOP)
     {
-        string = {0x00, 0x00, 0x00};
+        string[0] = 0x00;
+        string[1] = 0x00;
+        string[2] = 0x00;
     }
     #ifdef ECHO
     uartSendRaw(string, MC_RECVBUFFER_SIZE);

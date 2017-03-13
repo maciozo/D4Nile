@@ -26,7 +26,7 @@ void setup(void)
 {
     // debug("SENSINIT", 8);
     init_sensor();
-    
+    init_sonar();
     delay(20000);
     
     initDebug();

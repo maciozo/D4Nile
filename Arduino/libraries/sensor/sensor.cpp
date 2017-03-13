@@ -242,3 +242,24 @@ void change_pwm(double left_front, double left_back, double right_front, double 
     OCR2B = left_back/33.3;
 }
 
+init_sonar()
+{
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+
+int read_ultrasonic()
+{
+  digitalWrite(trigPin, LOW); 
+  delayMicroseconds(2); 
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10); 
+ 
+  digitalWrite(trigPin, LOW);
+  int duration = pulseIn(echoPin, HIGH);
+  int distance = duration/58.2;
+
+  return distance;
+}
