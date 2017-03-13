@@ -29,9 +29,9 @@ double roll_angle, pitch_angle, yall_angular_vel;
 double err_roll, err_pitch, err_yall;
 double left_front, right_front, left_back, right_back;
 
-double roll_kp=10, roll_ki=0, roll_kd=0;
-double pitch_kp=10, pitch_ki=0, pitch_kd=0;
-double yall_kp=10, yall_ki=0, yall_kd=0;
+double roll_kp=0, roll_ki=0, roll_kd=0;
+double pitch_kp=0, pitch_ki=0, pitch_kd=0;
+double yall_kp=0, yall_ki=0, yall_kd=0;
 
 PID roll_PID(&roll_angle, &err_roll, &roll_setpoint, roll_kp, roll_ki, roll_kd, DIRECT);
 PID pitch_PID(&pitch_angle, &err_pitch, &pitch_setpoint, pitch_kp, pitch_ki, pitch_kd, DIRECT);
@@ -114,20 +114,24 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
     yall_setpoint = target_values->yaw_ccw;
     altitude_coeff = target_values->throttle_up;
 
-    roll_angle = ypr[2] * 180/M_PI; 
-    pitch_angle = ypr[1] * 180/M_PI;
-    yall_angular_vel = gyro[2];
+    roll_angle = ypr[2] * 180/M_PI - 0.68; 
+    pitch_angle = ypr[1] * 180/M_PI - 2.05;
+    yall_angular_vel = (gz / 30) + 2; // Change to gyro[2] if it doesn't work
+    
+    sensor_data->yaw_ccw = yall_angular_vel;
+    sensor_data->pitch_forward = pitch_angle;
+    sensor_data->roll_left = roll_angle;
     
     /* PID Tuning */
-    // roll_kp = target_values->roll_kp;
-    // roll_ki = target_values->roll_ki;
-    // roll_kd = target_values->roll_kd;
-    // pitch_kp = target_values->pitch_kp;
-    // pitch_ki = target_values->pitch_ki;
-    // pitch_kd = target_values->roll_kd;
-    // yall_kp = target_values->yaw_kp;
-    // yall_ki = target_values->yaw_ki;
-    // yall_kd = target_values->yaw_kd;
+    roll_kp = target_values->roll_kp;
+    roll_ki = target_values->roll_ki;
+    roll_kd = target_values->roll_kd;
+    pitch_kp = target_values->pitch_kp;
+    pitch_ki = target_values->pitch_ki;
+    pitch_kd = target_values->roll_kd;
+    yall_kp = target_values->yaw_kp;
+    yall_ki = target_values->yaw_ki;
+    yall_kd = target_values->yaw_kd;
     
     /* Wait until the transmit buffer is populated. UDREn goes high when data register is empty. */
     // while (!(UCSR0A & (1 << UDRE0)));
@@ -143,10 +147,15 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
     pitch_PID.Compute();
     yall_PID.Compute();
 
-    right_back = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
-    right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
-    left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
-    left_front = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    // right_back = thrust*altitude_coeff - err_pitch + err_roll - err_yall;
+    // right_front = thrust*altitude_coeff - err_pitch - err_roll + err_yall;
+    // left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
+    // left_front = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
+    
+    right_back = thrust*altitude_coeff - err_pitch;
+    right_front = thrust*altitude_coeff - err_pitch;
+    left_back = thrust*altitude_coeff + err_pitch;
+    left_front = thrust*altitude_coeff + err_pitch;
     
     // left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
     // right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
@@ -202,13 +211,7 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
         mpu.getRotation(&gx, &gy, &gz);
         mpu.dmpGetGyro(gyro,fifoBuffer);
         mpuIntStatus = mpu.getIntStatus();
-
-        unsigned long time = millis();
     }
-    
-    sensor_data->yaw_ccw = (double)gyro[2];
-    sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
-    sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
 }
 
 void init_pwm(void)

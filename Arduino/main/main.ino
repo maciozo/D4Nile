@@ -20,6 +20,8 @@
     HCMAX7219 HCMAX7219(LOAD);
 #endif
 
+float batteryV;
+
 void setup(void)
 {
     // debug("SENSINIT", 8);
@@ -81,6 +83,9 @@ void sendNewSensorData(commanddata_t* sensor_data, commanddata_t* old_sensor_dat
     uartSendCommand(YAW_CCW, (int16_t)((sensor_data->yaw_ccw) * 32767 / 90));
     uartSendCommand(ROLL_LEFT, (int16_t)((sensor_data->roll_left) * 32767 / 10));
     uartSendCommand(PITCH_FORWARD, (int16_t)((sensor_data->pitch_forward) * 32767 / 10));
+    
+    batteryV = batteryVoltage();
+    uartSendCommand(VOLTAGE, (int16_t)(batteryV * 100));
 }
 
 void initDebug()

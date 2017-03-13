@@ -25,5 +25,6 @@ void init_pwm(void);
 void change_pwm(double left_front, double left_back, double right_front, double right_back);
 void init_sonar();
 int read_ultrasonic();
+float batteryVoltage();
 
 #endif /* SENSOR_H_ */
