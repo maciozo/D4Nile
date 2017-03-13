@@ -38,7 +38,7 @@ int formatData(commanddata_t* commandData, char* rawdata)
             commandData->mode_button = rawdata[2];
             break;
         case SERVO_BUTTON:
-            commandData->servo_button = rawdata[2];
+            commandData->servo_button = rawdata[2] & 0xFF;
             break;
         case AUTOLAND:
             commandData->autoland = rawdata[2];

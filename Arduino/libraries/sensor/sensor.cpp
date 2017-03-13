@@ -166,6 +166,15 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
         
     if (left_front > maxPWM) left_front = maxPWM;
         else if (left_front < minPWM) left_front = minPWM;
+        
+    if (target_values->servo_button)
+    {
+        OCR1A = 24 // Set OCR for servo to open
+    }
+    else
+    {
+        OCR1A = 12; //Set OCR for servo to closed
+    }
 
     change_pwm(left_front, left_back, right_front, right_back);
 
