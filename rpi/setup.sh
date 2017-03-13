@@ -16,7 +16,7 @@ systemctl disable serial-getty@ttyS0.service
 
 # Run init script on boot
 crontab -l > tempcron
-echo "@reboot /home/pi/D4Nile/rpi/init.sh" >> tempcron
+echo "@reboot /home/pi/D4Nile/rpi/telemetry_server/start.sh" >> tempcron
 crontab tempcron
 rm tempcron
 
