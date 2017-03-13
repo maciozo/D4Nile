@@ -73,21 +73,17 @@ void uartSendRaw(char* string, unsigned int length)
     return;
 }
 
-void uartSendCommand(unsigned char command, int16_t data)
+void uartSendCommand(char command, int16_t data)
 {
-    unsigned char toSend[MC_SENDBUFFER_SIZE];
-    // unsigned char *floatToChar = (unsigned char*)(&data);
+    unsigned char toSend[MC_SENDBUFFER_SIZE + 2];
     
-    toSend[0] = (unsigned char)command;
-    // toSend[1] = floatToChar[0];
-    // toSend[2] = floatToChar[1];
-    // toSend[3] = floatToChar[2];
-    // toSend[4] = floatToChar[3];
-    toSend[1] = (char) (data >> 8);
-    toSend[2] = (char) (data & 0xFF);
-    // toSend[5] = (unsigned char)'\n';
+    toSend[0] = (char) UART_START;
+    toSend[1] = (char) command;
+    toSend[2] = (char) (data >> 8);
+    toSend[3] = (char) (data & 0xFF);
+    toSend[4] = (char) UART_STOP;
     
-    uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
+    uartSendRaw(toSend, MC_SENDBUFFER_SIZE + 2);
     
     return;
 }
