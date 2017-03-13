@@ -61,7 +61,7 @@ const attitude = {
 let start_sending = false;
 let zero_values_loop = setInterval(() => {
 	UART.send_message('THROTTLE', -32768);
-}, 1000);
+}, 500);
 
 UART.init_serial('/dev/serial0');
 UART.on_message(command => {
@@ -112,9 +112,10 @@ controller.on('axis', data => {
 	}
 });
 controller.on('button', data => {
-	if (data.number == 13) { // trackpad
+	if (data.number == 13 && data.value == 1) { // trackpad
 		UART.send_message('KILL');
-	} else if (data.number == 0) {
+	} else if (data.number == 0 && data.value == 1) { // square
+		console.log('ARM');
 		start_sending = true;
 		clearInterval(zero_values_loop);
 	}
