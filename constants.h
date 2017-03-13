@@ -42,6 +42,9 @@
     #define YAW_KD 0x30
     
     #define STAHP 0x7F
+    
+    #define UART_START 0x7E
+    #define UART_STOP 0x7D
 
 /* ========================================================================== */
 

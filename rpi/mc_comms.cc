@@ -49,9 +49,11 @@ int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
         8 bit command, 2x 8 bit data.
         CCCCCCCC|DDDDDDDD|DDDDDDDD
     */
-    toSend[0] = (char)command;
-    toSend[1] = (char)(data >> 8);
-    toSend[2] = (char)(data & 0x00FF);
+    toSend[0] = (char)UART_START;
+    toSend[1] = (char)command;
+    toSend[2] = (char)(data >> 8);
+    toSend[3] = (char)(data & 0x00FF);
+    toSend[4] = (char)UART_STOP;
     // toSend[3] = (char)'\n';
     
     uartSendRaw(uartDevice, toSend, SENDBUFFER_SIZE);

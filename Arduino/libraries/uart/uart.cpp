@@ -95,6 +95,7 @@ void uartSendCommand(unsigned char command, int16_t data)
 void uartReadRaw(char* string, unsigned int length)
 {
     unsigned int i;
+    while (UDR0 != (char)UART_START);
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
@@ -102,6 +103,10 @@ void uartReadRaw(char* string, unsigned int length)
         
         /* Store character from transmission buffer */
         string[i] = UDR0;
+    }
+    if (UDR0 != (char)UART_STOP)
+    {
+        string = {0x00, 0x00, 0x00};
     }
     #ifdef ECHO
     uartSendRaw(string, MC_RECVBUFFER_SIZE);
