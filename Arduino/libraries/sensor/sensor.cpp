@@ -280,6 +280,6 @@ int read_ultrasonic()
 float batteryVoltage()
 {
     float voltage = analogRead(batteryRead);
-    voltage=((voltage *5)/1024)*3.1839;
+    voltage=((voltage *3.3)/1024)*4.274;
     return voltage;
 }
