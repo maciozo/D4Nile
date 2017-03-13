@@ -73,17 +73,19 @@ void uartSendRaw(char* string, unsigned int length)
     return;
 }
 
-void uartSendCommand(unsigned char command, double data)
+void uartSendCommand(unsigned char command, int16_t data)
 {
     unsigned char toSend[MC_SENDBUFFER_SIZE];
-    unsigned char *floatToChar = (unsigned char*)(&data);
+    // unsigned char *floatToChar = (unsigned char*)(&data);
     
     toSend[0] = (unsigned char)command;
-    toSend[1] = floatToChar[0];
-    toSend[2] = floatToChar[1];
-    toSend[3] = floatToChar[2];
-    toSend[4] = floatToChar[3];
-    toSend[5] = (unsigned char)'\n';
+    // toSend[1] = floatToChar[0];
+    // toSend[2] = floatToChar[1];
+    // toSend[3] = floatToChar[2];
+    // toSend[4] = floatToChar[3];
+    toSend[1] = (char) (data >> 8);
+    toSend[2] = (char) (data & 0xFF);
+    // toSend[5] = (unsigned char)'\n';
     
     uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
     
@@ -93,35 +95,20 @@ void uartSendCommand(unsigned char command, double data)
 void uartReadRaw(char* string, unsigned int length)
 {
     unsigned int i;
-    char temp;
-    int x;
+    while (UDR0 != (char)UART_START);
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
-        while (!(UCSR0A & (1 << RXC0)));
+        // while (!(UCSR0A & (1 << RXC0)));
         
         /* Store character from transmission buffer */
         string[i] = UDR0;
-        if (i == (length - 1))
-        {
-            if (string[i] != 0x0A)
-            {
-                x = 0;
-                while (!x)
-                {
-                    while (!(UCSR0A & (1 << RXC0)));
-                    temp = UDR0;
-                    if (temp == 0x0A)
-                    {
-                        x = 1;
-                        for (i = 0; i < length; i++)
-                        {
-                            while (!(UCSR0A & (1 << RXC0)));
-                            string[i] = UDR0;
-                        }
-                    }
-                }
-            }
-        }
     }
+    if (UDR0 != (char)UART_STOP)
+    {
+        string = {0x00, 0x00, 0x00};
+    }
+    #ifdef ECHO
+    uartSendRaw(string, MC_RECVBUFFER_SIZE);
+    #endif
 }

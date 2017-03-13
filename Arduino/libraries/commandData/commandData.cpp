@@ -1,33 +1,47 @@
 #include "commandData.h"
 #include "constants.h"
+#include <avr/io.h>
+
+#include "uart.h"
 
 int formatData(commanddata_t* commandData, char* rawdata)
 {
-    int32_t notYetFloat = (rawdata[4] << 24) | (rawdata[3] << 16) | (rawdata[2] << 8) | (rawdata[1]);
-    double tempData = *(double*)&notYetFloat;
+    int16_t tempData = (rawdata[1] << 8) | (rawdata[2] & 0xFF);
     switch (rawdata[0])
     {
+        case STAHP:
+            if (tempData)
+            {
+                while(1)
+                {
+                    OCR0A = 62;
+                    OCR0B = 62;
+                    OCR2A = 62;
+                    OCR2B = 62;
+                }
+            }
+            break;
         case YAW_CCW:
-            commandData->yaw_ccw = tempData;
+            commandData->yaw_ccw = (tempData / 32767.0) * 90;
             break;
         case THROTTLE_UP:
-            commandData->throttle_up = tempData;
+            commandData->throttle_up = (tempData/327670.0) + 1;
             break;
         case ROLL_LEFT:
-            commandData->roll_left = tempData;
+            commandData->roll_left = (tempData / 32767.0) * 10;
             break;
             
         case PITCH_FORWARD:
-            commandData->pitch_forward = tempData;
+            commandData->pitch_forward = (tempData / 32767.0) * 10;
             break;
         case MODE_BUTTON:
-            commandData->mode_button = tempData;
+            commandData->mode_button = rawdata[2];
             break;
         case SERVO_BUTTON:
-            commandData->servo_button = tempData;
+            commandData->servo_button = rawdata[2];
             break;
         case AUTOLAND:
-            commandData->autoland = tempData;
+            commandData->autoland = rawdata[2];
             break;
             
         case ROLL_KP:
@@ -64,6 +78,17 @@ int formatData(commanddata_t* commandData, char* rawdata)
             
         case YAW_KD:
             commandData->yaw_kd = tempData;
+            break;
+            
+        case PID_DEC:
+            if (commandData->CURRENT_TUNING > 0.0)
+            {
+                commandData->CURRENT_TUNING -= (tempData & 1) * 0.1;
+            }
+            break;
+            
+        case PID_INC:
+            commandData->CURRENT_TUNING += (tempData & 1) * 0.1;
             break;
             
         default:
