@@ -61,10 +61,17 @@ int uartSendCommand(FILE* uartDevice, uint8_t command, int16_t data)
 }
 
 int uartReadRaw(FILE* uartDevice, char* recvBuffer, size_t length)
-{    
-    if (fgets(recvBuffer, length, uartDevice) != NULL)
+{   
+    if (fgetc(uartDevice) != UART_START)
     {
-        return 0;
+        recvBuffer = "";
+        return 1;
     }
-    return 1;
+    fgets(recvBuffer, length, uartDevice);
+    if (fgetc(uartDevice) != UART_STOP)
+    {
+        recvBuffer = "";
+        return 2;
+    }
+    return 0;
 }
