@@ -20,8 +20,6 @@
     HCMAX7219 HCMAX7219(LOAD);
 #endif
 
-float data[] = {0.0, 0.0, 0.0};
-
 void setup(void)
 {
     // debug("SENSINIT", 8);
@@ -70,7 +68,7 @@ void loop(void)
     
     /* Do PID calculations to get the real sensor values towards the target values */
     // debug("DE  LOOP", 8);
-    do_everything(&sensor_data, &target_values, data);
+    do_everything(&sensor_data, &target_values);
     
     /* Send any sensor values that have changed since they were last sent */
     // debug("SENDUART", 8);

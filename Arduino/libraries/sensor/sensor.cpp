@@ -107,7 +107,7 @@ void dmpDataReady()
     mpuInterrupt = true;
 }
 
-void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, float *data)
+void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
 {
     roll_setpoint = target_values->roll_left;
     pitch_setpoint = target_values->pitch_forward;
@@ -209,10 +209,6 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values, flo
     sensor_data->yaw_ccw = (double)gyro[2];
     sensor_data->pitch_forward = (double)(ypr[1]* 180.0/M_PI);
     sensor_data->roll_left = (double)(ypr[2]* 180.0/M_PI);
-    
-    data[0] = gyro[2];
-    data[1] = ypr[1]* 180/M_PI;
-    data[2] = ypr[2]* 180/M_PI;
 }
 
 void init_pwm(void)
