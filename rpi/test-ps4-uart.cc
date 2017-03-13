@@ -23,7 +23,7 @@
 // Negative values correspond to the direction in variable names (positive for opposite direction)
 int16_t servoButton = 0; //Turn on/off electromagnet
 int16_t modeButton = 0; //Acts as mode switch between joystick and motion control methods
-int16_t throttleUp = 0; // Axis 1
+int16_t throttleUp = 0x8001; // Axis 1
 int16_t yawCCW = 0;       // Axis 0
 int16_t pitchForward = 0;  // Axis 5 (Joystick) Axis 13 (Motion)
 int16_t rollLeft = 0;      // Axis 2 (Joystick) Axis 11 (Motion)
@@ -52,6 +52,11 @@ int main(int argc, char** argv)
     else
     {
         printf("Joystick not detected, exiting.\n");
+        while(1)
+        {
+            uartSendCommand(serialDevice, STAHP, 1);
+            usleep(1000);
+        }
         exit(1);
     }
 
