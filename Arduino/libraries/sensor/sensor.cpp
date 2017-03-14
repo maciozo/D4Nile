@@ -152,10 +152,15 @@ void do_everything(commanddata_t* sensor_data, commanddata_t* target_values)
     // left_back = thrust*altitude_coeff + err_pitch + err_roll + err_yall;
     // left_front = thrust*altitude_coeff + err_pitch - err_roll - err_yall;
     
-    right_back = thrust*altitude_coeff - err_pitch;
-    right_front = thrust*altitude_coeff - err_pitch;
-    left_back = thrust*altitude_coeff + err_pitch;
-    left_front = thrust*altitude_coeff + err_pitch;
+    right_back = thrust*altitude_coeff + err_roll;
+    right_front = thrust*altitude_coeff - err_roll;
+    left_back = thrust*altitude_coeff + err_roll;
+    left_front = thrust*altitude_coeff- err_roll;
+    
+    // right_back = thrust*altitude_coeff - err_pitch;
+    // right_front = thrust*altitude_coeff - err_pitch;
+    // left_back = thrust*altitude_coeff + err_pitch;
+    // left_front = thrust*altitude_coeff + err_pitch;
     
     // left_front = thrust*altitude_coeff - pitch_setpoint*10 + roll_setpoint*10 - yall_setpoint;
     // right_front = thrust*altitude_coeff - pitch_setpoint*10 - roll_setpoint*10 + yall_setpoint;
@@ -237,14 +242,24 @@ void init_pwm(void)
     //select clock to give prescaler 1024, giving a frequency of 61Hz
     TCCR1B = _BV(CS12) | _BV(CS10) | _BV(WGM12);
 
+    //servo output compare register setup.
+    OCR1A = 12;
+    
     //set initial value for OCRs
+    // OCR0A = 122;
+    // OCR0B = 122;
+    // OCR2A = 122;
+    // OCR2B = 122;
+    // delay(10000);
     OCR0A = 62;
     OCR0B = 62;
     OCR2A = 62;
     OCR2B = 62;
-    
-    //servo output compare register setup.
-    OCR1A = 12;
+    delay(1000);
+    OCR0A = 66;
+    OCR0B = 66;
+    OCR2A = 66;
+    OCR2B = 66;
 }
 
 void change_pwm(double left_front, double left_back, double right_front, double right_back)

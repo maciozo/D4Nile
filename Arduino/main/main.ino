@@ -75,6 +75,7 @@ void loop(void)
     /* Send any sensor values that have changed since they were last sent */
     // debug("SENDUART", 8);
     sendNewSensorData(&sensor_data, &old_sensor_data);
+    // sendNewSensorData(&target_values, &old_sensor_data);
 }
 
 /* Compares each current sensor value to the old one. Only sends ones that have changed */

@@ -4,7 +4,7 @@
 #define INTERRUPT_PIN 2
 #define minPWM 2000
 #define maxPWM 4000
-#define thrust 2300
+#define thrust 3200
 
 #define echoPin 3 // Echo Pin
 #define trigPin 2 // Trigger Pin

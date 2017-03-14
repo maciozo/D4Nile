@@ -75,15 +75,21 @@ void uartSendRaw(char* string, unsigned int length)
 
 void uartSendCommand(char command, int16_t data)
 {
-    unsigned char toSend[MC_SENDBUFFER_SIZE + 2];
+    // unsigned char toSend[MC_SENDBUFFER_SIZE + 2];
+    unsigned char toSend[MC_SENDBUFFER_SIZE];
     
-    toSend[0] = (char) UART_START;
-    toSend[1] = (char) command;
-    toSend[2] = (char) (data >> 8);
-    toSend[3] = (char) (data & 0xFF);
-    toSend[4] = (char) UART_STOP;
+    // toSend[0] = (char) UART_START;
+    // toSend[1] = (char) command;
+    // toSend[2] = (char) (data >> 8);
+    // toSend[3] = (char) (data & 0xFF);
+    // toSend[4] = (char) UART_STOP;
     
-    uartSendRaw(toSend, MC_SENDBUFFER_SIZE + 2);
+    toSend[0] = (char) command;
+    toSend[1] = (char) (data >> 8);
+    toSend[2] = (char) (data & 0xFF);
+    
+    // uartSendRaw(toSend, MC_SENDBUFFER_SIZE + 2);
+    uartSendRaw(toSend, MC_SENDBUFFER_SIZE);
     
     return;
 }
@@ -91,7 +97,7 @@ void uartSendCommand(char command, int16_t data)
 void uartReadRaw(char* string, unsigned int length)
 {
     unsigned int i;
-    while (UDR0 != (char)UART_START);
+    // while (UDR0 != UART_START);
     for (i = 0; i < length; i++)
     {
         /* Wait until USART receive complete. RXCn goes high. */
@@ -100,12 +106,12 @@ void uartReadRaw(char* string, unsigned int length)
         /* Store character from transmission buffer */
         string[i] = UDR0;
     }
-    if (UDR0 != (char)UART_STOP)
-    {
-        string[0] = 0x00;
-        string[1] = 0x00;
-        string[2] = 0x00;
-    }
+    // if (UDR0 != UART_STOP)
+    // {
+        // string[0] = 0x00;
+        // string[1] = 0x00;
+        // string[2] = 0x00;
+    // }
     #ifdef ECHO
     uartSendRaw(string, MC_RECVBUFFER_SIZE);
     #endif
